@@ -1,8 +1,10 @@
-/**
- * Admin Users Component
- * Manage users and create restaurant owners
- */
-"use client";
+~(
+  /**
+   * Admin Users Component
+   * Manage users and create restaurant owners
+   */
+  "use client"
+);
 
 import React, { useEffect, useState } from "react";
 import {
@@ -30,8 +32,13 @@ import {
   Paper,
   Chip,
   Alert,
+  IconButton,
 } from "@mui/material";
-import { Add as AddIcon, Edit as EditIcon } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import { apiClient } from "@/lib/api";
 
 interface User {
@@ -192,6 +199,35 @@ export default function AdminUsers() {
     }
   };
 
+  const handleDeleteUser = async (user: User) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete user: ${user.name} (${user.email})?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await apiClient.delete(`/admin/users/${user.id}`);
+
+      setMessage({
+        type: "success",
+        text: `User ${user.email} deleted successfully!`,
+      });
+
+      fetchUsers();
+
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    } catch (error: any) {
+      setMessage({
+        type: "error",
+        text: error.response?.data?.detail || "Failed to delete user",
+      });
+    }
+  };
   return (
     <Box>
       <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between" }}>
@@ -274,6 +310,15 @@ export default function AdminUsers() {
                     >
                       Edit
                     </Button>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteUser(user)}
+                      disabled={user.role === "admin"}
+                      sx={{ ml: 1 }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
