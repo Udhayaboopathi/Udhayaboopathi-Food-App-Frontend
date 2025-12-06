@@ -40,6 +40,7 @@ interface MenuItem {
   category: string;
   image_url: string;
   is_available: boolean;
+  is_veg?: boolean;
   restaurant_id: number;
   restaurant?: {
     id: number;
@@ -113,6 +114,8 @@ export default function FoodPage() {
       quantity: 1,
       restaurant_id: item.restaurant_id,
       restaurant_name: item.restaurant?.name || "",
+      image: item.image_url,
+      is_veg: item.is_veg || false,
     });
   };
 
