@@ -257,7 +257,9 @@ export default function ProfilePage() {
         });
       }, 2000);
     } catch (err: any) {
-      setPasswordError(err.response?.data?.detail || "Failed to change password");
+      setPasswordError(
+        err.response?.data?.detail || "Failed to change password"
+      );
     }
   };
 
