@@ -70,42 +70,38 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      // Fetch all users
+      // Fetch all orders from admin endpoint
+      const ordersResponse = await apiClient.get("/admin/orders");
+      const allOrders = ordersResponse.data;
+
+      // Fetch all users for email lookup
       const usersResponse = await apiClient.get("/admin/users");
       const users = usersResponse.data;
 
-      // Fetch all restaurants
+      // Fetch all restaurants for name lookup
       const restaurantsResponse = await apiClient.get("/admin/restaurants");
       const restaurants = restaurantsResponse.data;
 
-      // Fetch orders for each user
-      const allOrders: Order[] = [];
-      for (const user of users) {
-        try {
-          const ordersResponse = await apiClient.get(`/orders/user/${user.id}`);
-          const userOrders = ordersResponse.data.map((order: Order) => {
-            const restaurant = restaurants.find(
-              (r: any) => r.id === order.restaurant_id
-            );
-            return {
-              ...order,
-              restaurant_name: restaurant?.name || "Unknown",
-              user_email: user.email,
-            };
-          });
-          allOrders.push(...userOrders);
-        } catch (error) {
-          // User might not have orders
-        }
-      }
+      // Enrich orders with user and restaurant data
+      const enrichedOrders = allOrders.map((order: Order) => {
+        const user = users.find((u: any) => u.id === order.user_id);
+        const restaurant = restaurants.find(
+          (r: any) => r.id === order.restaurant_id
+        );
+        return {
+          ...order,
+          restaurant_name: restaurant?.name || "Unknown",
+          user_email: user?.email || "Unknown",
+        };
+      });
 
       // Sort by created_at descending
-      allOrders.sort(
-        (a, b) =>
+      enrichedOrders.sort(
+        (a: Order, b: Order) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 
-      setOrders(allOrders);
+      setOrders(enrichedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {

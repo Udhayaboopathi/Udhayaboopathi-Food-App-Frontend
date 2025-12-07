@@ -54,29 +54,23 @@ export default function AdminDashboard() {
       const restaurantsResponse = await apiClient.get("/admin/restaurants");
       const restaurants = restaurantsResponse.data;
 
-      // Fetch all orders
-      const allOrders: any[] = [];
-      for (const user of users) {
-        try {
-          const ordersResponse = await apiClient.get(`/orders/user/${user.id}`);
-          allOrders.push(...ordersResponse.data);
-        } catch (error) {
-          // User might not have orders
-        }
-      }
+      // Fetch all orders from admin endpoint
+      const ordersResponse = await apiClient.get("/admin/orders");
+      const allOrders = ordersResponse.data;
 
       // Calculate stats
       const totalRevenue = allOrders
-        .filter((o) => o.status === "delivered")
-        .reduce((sum, o) => sum + o.total_amount, 0);
+        .filter((o: any) => o.status === "delivered")
+        .reduce((sum: number, o: any) => sum + o.total_amount, 0);
 
       setStats({
         totalUsers: users.length,
         totalRestaurants: restaurants.length,
         totalOrders: allOrders.length,
         totalRevenue,
-        pendingOrders: allOrders.filter((o) => o.status === "pending").length,
-        deliveredOrders: allOrders.filter((o) => o.status === "delivered")
+        pendingOrders: allOrders.filter((o: any) => o.status === "pending")
+          .length,
+        deliveredOrders: allOrders.filter((o: any) => o.status === "delivered")
           .length,
         activeRestaurants: restaurants.filter((r: any) => r.is_active).length,
         ownerUsers: users.filter((u: any) => u.role === "owner").length,

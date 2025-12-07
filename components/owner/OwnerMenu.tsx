@@ -30,6 +30,7 @@ import {
   Delete as DeleteIcon,
 } from "@mui/icons-material";
 import { apiClient } from "@/lib/api";
+import ImageCropUpload from "@/components/ImageCropUpload";
 
 interface MenuItem {
   id: number;
@@ -48,7 +49,6 @@ export default function OwnerMenu() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -104,34 +104,6 @@ export default function OwnerMenu() {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingItem(null);
-  };
-
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-
-      const response = await apiClient.post("/upload/image", uploadFormData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Set the full URL including backend base
-      const imageUrl = `http://localhost:8000${response.data.url}`;
-      setFormData({ ...formData, image: imageUrl });
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Failed to upload image");
-    } finally {
-      setUploading(false);
-    }
   };
 
   const handleSave = async () => {
@@ -294,49 +266,33 @@ export default function OwnerMenu() {
               />
             </Grid>
             <Grid item xs={12}>
-              <Box sx={{ mb: 2 }}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  fullWidth
-                  disabled={uploading}
-                >
-                  {uploading ? "Uploading..." : "Upload Image"}
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </Button>
-              </Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Menu Item Image
+              </Typography>
               {formData.image && (
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Image Preview:
-                  </Typography>
                   <Box
                     component="img"
                     src={formData.image}
                     alt="Preview"
                     sx={{
                       width: "100%",
-                      height: 200,
+                      maxHeight: 200,
                       objectFit: "cover",
                       borderRadius: 1,
-                      mt: 1,
                     }}
                   />
                 </Box>
               )}
-              <TextField
-                fullWidth
-                label="Or paste Image URL"
-                value={formData.image}
-                onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
+              <ImageCropUpload
+                uploadType="menu"
+                aspectRatio={4 / 3}
+                onImageUploaded={(url) =>
+                  setFormData({ ...formData, image: url })
                 }
-                size="small"
+                currentImage={formData.image}
+                buttonText="Upload Menu Item Image"
+                buttonVariant="outlined"
               />
             </Grid>
             <Grid item xs={6}>

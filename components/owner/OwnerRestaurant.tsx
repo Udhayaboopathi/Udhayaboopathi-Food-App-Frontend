@@ -14,9 +14,11 @@ import {
   Box,
   Grid,
   Alert,
+  CardMedia,
 } from "@mui/material";
 import { Save as SaveIcon } from "@mui/icons-material";
 import { apiClient } from "@/lib/api";
+import ImageCropUpload from "@/components/ImageCropUpload";
 
 interface Restaurant {
   id: number;
@@ -172,13 +174,33 @@ export default function OwnerRestaurant() {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Image URL"
-              value={restaurant.thumbnail}
-              onChange={(e) =>
-                setRestaurant({ ...restaurant, thumbnail: e.target.value })
+            <Typography variant="subtitle2" gutterBottom>
+              Restaurant Image
+            </Typography>
+            {restaurant.thumbnail && (
+              <CardMedia
+                component="img"
+                image={restaurant.thumbnail}
+                alt={restaurant.name}
+                sx={{
+                  width: "100%",
+                  maxWidth: 400,
+                  height: 200,
+                  objectFit: "cover",
+                  mb: 2,
+                  borderRadius: 1,
+                }}
+              />
+            )}
+            <ImageCropUpload
+              uploadType="restaurant"
+              aspectRatio={16 / 9}
+              onImageUploaded={(url) =>
+                setRestaurant({ ...restaurant, thumbnail: url })
               }
+              currentImage={restaurant.thumbnail}
+              buttonText="Upload Restaurant Image"
+              buttonVariant="outlined"
             />
           </Grid>
 

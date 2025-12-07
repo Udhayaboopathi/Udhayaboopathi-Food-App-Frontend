@@ -21,10 +21,15 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Person as PersonIcon, Lock as LockIcon } from "@mui/icons-material";
+import {
+  Person as PersonIcon,
+  Lock as LockIcon,
+  CameraAlt as CameraIcon,
+} from "@mui/icons-material";
 import { useAuthStore } from "@/lib/authStore";
 import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
+import ImageCropUpload from "@/components/ImageCropUpload";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -47,6 +52,7 @@ export default function ProfilePage() {
     phone: "",
     address: "",
   });
+  const [profileImage, setProfileImage] = useState<string>("");
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -61,6 +67,7 @@ export default function ProfilePage() {
         phone: user.phone || "",
         address: user.address || "",
       });
+      setProfileImage(user.profile_image || "");
     }
   }, [user, isAuthenticated, router]);
 
@@ -83,6 +90,7 @@ export default function ProfilePage() {
           name: formData.name,
           phone: formData.phone,
           address: formData.address,
+          profile_image: profileImage,
         },
       });
       await fetchUser();
@@ -143,10 +151,43 @@ export default function ProfilePage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-        <Avatar sx={{ width: 80, height: 80, bgcolor: "primary.main" }}>
-          <PersonIcon sx={{ fontSize: 48 }} />
-        </Avatar>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
+        <Box sx={{ position: "relative" }}>
+          <Avatar
+            src={profileImage || undefined}
+            sx={{ width: 100, height: 100, bgcolor: "primary.main" }}
+          >
+            {!profileImage && <PersonIcon sx={{ fontSize: 54 }} />}
+          </Avatar>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              bgcolor: "primary.main",
+              borderRadius: "50%",
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "3px solid white",
+              cursor: "pointer",
+              "&:hover": {
+                bgcolor: "primary.dark",
+              },
+            }}
+          >
+            <ImageCropUpload
+              uploadType="profile"
+              aspectRatio={1}
+              onImageUploaded={(url) => setProfileImage(url)}
+              currentImage={profileImage}
+              buttonText=""
+              buttonVariant="text"
+            />
+          </Box>
+        </Box>
         <Box>
           <Typography variant="h4" fontWeight={700}>
             My Profile
@@ -257,7 +298,7 @@ export default function ProfilePage() {
                 Account Type
               </Typography>
               <Typography variant="body1" fontWeight={600}>
-                {user.role.toUpperCase()}
+                {user?.role?.toUpperCase() || "USER"}
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -265,7 +306,7 @@ export default function ProfilePage() {
                 Account Status
               </Typography>
               <Typography variant="body1" fontWeight={600} color="success.main">
-                Active
+                {user?.is_active ? "Active" : "Inactive"}
               </Typography>
             </Grid>
           </Grid>

@@ -253,8 +253,12 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <IconButton onClick={handleMenu} sx={{ p: 0 }}>
-                    <Avatar sx={{ bgcolor: "secondary.main" }}>
-                      {user?.name?.charAt(0).toUpperCase()}
+                    <Avatar
+                      src={user?.profile_image || undefined}
+                      sx={{ bgcolor: "secondary.main" }}
+                    >
+                      {!user?.profile_image &&
+                        user?.name?.charAt(0).toUpperCase()}
                     </Avatar>
                   </IconButton>
                   <Menu
@@ -305,9 +309,11 @@ export default function Navbar() {
               {isAuthenticated && (
                 <IconButton onClick={handleMenu} sx={{ p: 0 }}>
                   <Avatar
+                    src={user?.profile_image || undefined}
                     sx={{ bgcolor: "secondary.main", width: 32, height: 32 }}
                   >
-                    {user?.name?.charAt(0).toUpperCase()}
+                    {!user?.profile_image &&
+                      user?.name?.charAt(0).toUpperCase()}
                   </Avatar>
                 </IconButton>
               )}

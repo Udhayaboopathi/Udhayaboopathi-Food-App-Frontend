@@ -47,6 +47,8 @@ interface Restaurant {
   delivery_time: number;
   is_active: boolean;
   owner_id: number | null;
+  owner_name?: string | null;
+  owner_email?: string | null;
 }
 
 export default function AdminRestaurants() {
@@ -168,7 +170,7 @@ export default function AdminRestaurants() {
               <TableCell>Rating</TableCell>
               <TableCell>Delivery Time</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Owner ID</TableCell>
+              <TableCell>Owner</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -187,7 +189,22 @@ export default function AdminRestaurants() {
                     size="small"
                   />
                 </TableCell>
-                <TableCell>{restaurant.owner_id || "None"}</TableCell>
+                <TableCell>
+                  {restaurant.owner_name ? (
+                    <Box>
+                      <Typography variant="body2" fontWeight={600}>
+                        {restaurant.owner_name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {restaurant.owner_email}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      None
+                    </Typography>
+                  )}
+                </TableCell>
                 <TableCell>
                   <IconButton
                     size="small"

@@ -177,7 +177,7 @@ export default function AdminUsers() {
     try {
       await apiClient.put(`/admin/users/${editingUser.id}/role`, {
         role: editingUser.role,
-        restaurant_id: editRestaurantId ? parseInt(editRestaurantId) : null,
+        restaurant_id: editRestaurantId || null,
       });
 
       setMessage({
