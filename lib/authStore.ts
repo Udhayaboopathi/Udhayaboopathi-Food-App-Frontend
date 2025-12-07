@@ -14,6 +14,7 @@ interface User {
   phone: string;
   address?: string;
   role: string;
+  profile_image?: string;
 }
 
 interface AuthState {
