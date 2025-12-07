@@ -68,6 +68,7 @@ export default function ProfilePage() {
     name: "",
     email: "",
     phone: "",
+    address: "",
   });
 
   // Addresses
@@ -106,6 +107,7 @@ export default function ProfilePage() {
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
+        address: user.address || "",
       });
       fetchAddresses();
       fetchPaymentMethods();
