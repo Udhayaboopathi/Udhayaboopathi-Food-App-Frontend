@@ -15,6 +15,7 @@ interface User {
   address?: string;
   role: string;
   profile_image?: string;
+  is_active?: boolean;
 }
 
 interface AuthState {
