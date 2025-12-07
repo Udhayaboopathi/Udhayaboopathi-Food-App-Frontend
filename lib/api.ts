@@ -159,6 +159,110 @@ async function handleMockRequest(
     return await mockAPI.getUserOrders(userId!);
   }
 
+  if (cleanUrl.match(/\/orders\/(.+)\/cancel/) && method === "post") {
+    const orderId = cleanUrl.match(/\/orders\/(.+)\/cancel/)?.[1];
+    return await mockAPI.cancelOrder(orderId!, data.reason, data.cancelledBy);
+  }
+
+  if (cleanUrl.match(/\/orders\/(.+)\/status/) && method === "put") {
+    const orderId = cleanUrl.match(/\/orders\/(.+)\/status/)?.[1];
+    return await mockAPI.updateOrderStatus(orderId!, data.status);
+  }
+
+  if (cleanUrl.match(/\/orders\/(.+)$/)) {
+    const orderId = cleanUrl.match(/\/orders\/(.+)/)?.[1];
+    return await mockAPI.getOrder(orderId!);
+  }
+
+  // Profile & User Management
+  if (cleanUrl.match(/\/users\/(.+)\/profile/)) {
+    const userId = cleanUrl.match(/\/users\/(.+)\/profile/)?.[1];
+    if (method === "put") {
+      return await mockAPI.updateProfile(userId!, data);
+    }
+    return await mockAPI.getProfile(userId!);
+  }
+
+  // Addresses
+  if (cleanUrl.match(/\/users\/(.+)\/addresses/)) {
+    const userId = cleanUrl.match(/\/users\/(.+)\/addresses/)?.[1];
+    if (method === "post") {
+      return await mockAPI.createAddress(data);
+    }
+    return await mockAPI.getUserAddresses(userId!);
+  }
+
+  if (cleanUrl.match(/\/addresses\/(.+)/) && method === "delete") {
+    const addressId = cleanUrl.match(/\/addresses\/(.+)/)?.[1];
+    return await mockAPI.deleteAddress(addressId!);
+  }
+
+  if (cleanUrl.match(/\/addresses\/(.+)/) && method === "put") {
+    const addressId = cleanUrl.match(/\/addresses\/(.+)/)?.[1];
+    return await mockAPI.updateAddress(addressId!, data);
+  }
+
+  // Payment Methods
+  if (cleanUrl.match(/\/users\/(.+)\/payment-methods/)) {
+    const userId = cleanUrl.match(/\/users\/(.+)\/payment-methods/)?.[1];
+    if (method === "post") {
+      return await mockAPI.createPaymentMethod(data);
+    }
+    return await mockAPI.getPaymentMethods(userId!);
+  }
+
+  if (cleanUrl.match(/\/payment-methods\/(.+)/) && method === "delete") {
+    const paymentId = cleanUrl.match(/\/payment-methods\/(.+)/)?.[1];
+    return await mockAPI.deletePaymentMethod(paymentId!);
+  }
+
+  // Favorites
+  if (cleanUrl.match(/\/users\/(.+)\/favorites/)) {
+    const userId = cleanUrl.match(/\/users\/(.+)\/favorites/)?.[1];
+    if (method === "post") {
+      return await mockAPI.addFavorite(userId!, data.restaurantId);
+    }
+    return await mockAPI.getUserFavorites(userId!);
+  }
+
+  if (cleanUrl.match(/\/favorites\/(.+)/) && method === "delete") {
+    const urlObj = new URL(url, "http://localhost");
+    const userId = urlObj.searchParams.get("userId");
+    const restaurantId = cleanUrl.match(/\/favorites\/(.+)/)?.[1];
+    return await mockAPI.removeFavorite(userId!, restaurantId!);
+  }
+
+  // Reviews
+  if (cleanUrl === "/reviews" && method === "post") {
+    return await mockAPI.createReview(data);
+  }
+
+  if (cleanUrl.match(/\/restaurants\/(.+)\/reviews/)) {
+    const restaurantId = cleanUrl.match(/\/restaurants\/(.+)\/reviews/)?.[1];
+    return await mockAPI.getRestaurantReviews(restaurantId!);
+  }
+
+  // Coupons
+  if (cleanUrl === "/coupons") {
+    return await mockAPI.getActiveCoupons();
+  }
+
+  if (cleanUrl.match(/\/coupons\/(.+)\/validate/) && method === "post") {
+    const code = cleanUrl.match(/\/coupons\/(.+)\/validate/)?.[1];
+    return await mockAPI.validateCoupon(code!, data.userId, data.orderAmount);
+  }
+
+  // Notifications
+  if (cleanUrl.match(/\/users\/(.+)\/notifications/)) {
+    const userId = cleanUrl.match(/\/users\/(.+)\/notifications/)?.[1];
+    return await mockAPI.getUserNotifications(userId!);
+  }
+
+  if (cleanUrl.match(/\/notifications\/(.+)\/read/) && method === "put") {
+    const notificationId = cleanUrl.match(/\/notifications\/(.+)\/read/)?.[1];
+    return await mockAPI.markNotificationRead(notificationId!);
+  }
+
   // Admin routes
   if (cleanUrl === "/admin/users") {
     return await mockAPI.getAdminUsers();

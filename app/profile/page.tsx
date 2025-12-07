@@ -20,39 +20,68 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  Chip,
+  Divider,
 } from "@mui/material";
 import {
   Person as PersonIcon,
   Lock as LockIcon,
-  CameraAlt as CameraIcon,
+  LocationOn as LocationIcon,
+  Payment as PaymentIcon,
+  AccountBalanceWallet as WalletIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
 import { useAuthStore } from "@/lib/authStore";
 import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
-import ImageCropUpload from "@/components/ImageCropUpload";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, fetchUser } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const [currentTab, setCurrentTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState("");
 
+  // Profile data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    address: "",
   });
-  const [profileImage, setProfileImage] = useState<string>("");
+
+  // Addresses
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [addressDialogOpen, setAddressDialogOpen] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    label: "Home",
+    street: "",
+    city: "",
+    state: "",
+    zip_code: "",
+    latitude: "",
+    longitude: "",
+  });
+
+  // Payment Methods
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [newPayment, setNewPayment] = useState({
+    type: "card",
+    card_number: "",
+    card_holder: "",
+    expiry_month: "",
+    expiry_year: "",
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -65,83 +94,118 @@ export default function ProfilePage() {
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
-        address: user.address || "",
       });
-      setProfileImage(user.profile_image || "");
+      fetchAddresses();
+      fetchPaymentMethods();
     }
   }, [user, isAuthenticated, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const fetchAddresses = async () => {
+    try {
+      const response = await apiClient.get(`/users/${user!.id}/addresses`);
+      setAddresses(response.data);
+    } catch (err) {
+      console.error("Failed to fetch addresses:", err);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await apiClient.get(
+        `/users/${user!.id}/payment-methods`
+      );
+      setPaymentMethods(response.data);
+    } catch (err) {
+      console.error("Failed to fetch payment methods:", err);
+    }
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      await apiClient.put(`/auth/users/${user?.id}`, null, {
-        params: {
-          name: formData.name,
-          phone: formData.phone,
-          address: formData.address,
-          profile_image: profileImage,
-        },
-      });
-      await fetchUser();
+      await apiClient.put(`/users/${user?.id}/profile`, formData);
       setSuccess("Profile updated successfully!");
     } catch (err: any) {
-      setError(
-        err.response?.data?.detail ||
-          "Failed to update profile. Please try again."
-      );
+      setError(err.response?.data?.detail || "Failed to update profile");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePasswordChange = async () => {
-    setPasswordError("");
-    setPasswordSuccess("");
-
-    // Validate passwords
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError("New passwords do not match");
-      return;
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters");
-      return;
-    }
-
+  const handleAddAddress = async () => {
     try {
-      await apiClient.put(`/auth/users/${user?.id}/password`, null, {
-        params: {
-          old_password: passwordData.oldPassword,
-          new_password: passwordData.newPassword,
-        },
+      const response = await apiClient.post(`/users/${user!.id}/addresses`, {
+        ...newAddress,
+        user_id: user!.id,
       });
-
-      setPasswordSuccess("Password changed successfully!");
-      setTimeout(() => {
-        setPasswordDialogOpen(false);
-        setPasswordData({
-          oldPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setPasswordSuccess("");
-      }, 2000);
+      setAddresses([...addresses, response.data]);
+      setAddressDialogOpen(false);
+      setNewAddress({
+        label: "Home",
+        street: "",
+        city: "",
+        state: "",
+        zip_code: "",
+        latitude: "",
+        longitude: "",
+      });
+      setSuccess("Address added successfully!");
     } catch (err: any) {
-      setPasswordError(
-        err.response?.data?.detail || "Failed to change password"
+      setError(err.response?.data?.detail || "Failed to add address");
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      await apiClient.delete(`/addresses/${addressId}`);
+      setAddresses(addresses.filter((a) => a.id !== addressId));
+      setSuccess("Address deleted successfully!");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to delete address");
+    }
+  };
+
+  const handleAddPayment = async () => {
+    try {
+      const paymentData = {
+        user_id: user!.id,
+        type: newPayment.type,
+        card_number: newPayment.card_number,
+        card_holder: newPayment.card_holder,
+        expiry_month: newPayment.expiry_month,
+        expiry_year: newPayment.expiry_year,
+        last4: newPayment.card_number.slice(-4),
+      };
+      const response = await apiClient.post(
+        `/users/${user!.id}/payment-methods`,
+        paymentData
       );
+      setPaymentMethods([...paymentMethods, response.data]);
+      setPaymentDialogOpen(false);
+      setNewPayment({
+        type: "card",
+        card_number: "",
+        card_holder: "",
+        expiry_month: "",
+        expiry_year: "",
+      });
+      setSuccess("Payment method added successfully!");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to add payment method");
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: string) => {
+    try {
+      await apiClient.delete(`/payment-methods/${paymentId}`);
+      setPaymentMethods(paymentMethods.filter((p) => p.id !== paymentId));
+      setSuccess("Payment method deleted successfully!");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to delete payment method");
     }
   };
 

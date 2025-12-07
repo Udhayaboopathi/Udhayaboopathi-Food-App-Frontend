@@ -46,8 +46,17 @@ export default function OrdersPage() {
     setError("");
 
     try {
-      const response = await apiClient.get("/orders");
-      setOrders(response.data);
+      const response = await apiClient.get(
+        `/orders/user/${
+          (window as any).useAuthStore?.getState?.()?.user?.id || "user_001"
+        }`
+      );
+      // Sort by creation date, newest first
+      const sortedOrders = response.data.sort(
+        (a: any, b: any) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setOrders(sortedOrders);
     } catch (err: any) {
       setError(
         err.response?.data?.detail || "Failed to load orders. Please try again."
