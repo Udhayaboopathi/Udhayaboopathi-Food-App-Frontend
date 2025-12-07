@@ -28,11 +28,14 @@ import {
   Person as PersonIcon,
   Restaurant as RestaurantIcon,
   Menu as MenuIcon,
+  Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/authStore";
 import { useCartStore } from "@/lib/cartStore";
+import NotificationsPanel from "./NotificationsPanel";
+import apiClient from "@/lib/api";
 
 export default function Navbar() {
   const router = useRouter();
@@ -41,10 +44,26 @@ export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (isAuthenticated && user) {
+      fetchUnreadCount();
+    }
+  }, [isAuthenticated, user]);
+
+  const fetchUnreadCount = async () => {
+    if (!user) return;
+    try {
+      const response = await apiClient.get(`/users/${user.id}/notifications`);
+      const unread = response.data.filter((n: any) => !n.is_read).length;
+      setUnreadCount(unread);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -113,6 +132,9 @@ export default function Navbar() {
           <ListItem button onClick={() => handleMobileMenuClick("/orders")}>
             <ListItemText primary="My Orders" />
           </ListItem>
+          <ListItem button onClick={() => handleMobileMenuClick("/favorites")}>
+            <ListItemText primary="Favorites" />
+          </ListItem>
           <ListItem button onClick={() => handleMobileMenuClick("/profile")}>
             <ListItemText primary="Profile" />
           </ListItem>
@@ -135,9 +157,18 @@ export default function Navbar() {
 
   return (
     <>
-      <AppBar position="sticky" elevation={2} sx={{ backgroundColor: "white" }}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          backgroundColor: "white",
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          backdropFilter: "blur(10px)",
+        }}
+      >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 } }}>
+          <Toolbar disableGutters sx={{ minHeight: { xs: 60, sm: 70 } }}>
             {/* Mobile Menu Icon */}
             <IconButton
               color="inherit"
@@ -148,6 +179,9 @@ export default function Navbar() {
                 mr: 2,
                 display: { xs: "block", md: "none" },
                 color: "primary.main",
+                "&:hover": {
+                  bgcolor: "rgba(255, 107, 53, 0.08)",
+                },
               }}
             >
               <MenuIcon />
@@ -162,13 +196,25 @@ export default function Navbar() {
                 alignItems: "center",
                 textDecoration: "none",
                 mr: 2,
+                transition: "transform 0.2s ease",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                },
               }}
             >
               <Typography
-                variant="h6"
-                fontWeight={700}
-                color="primary.main"
-                sx={{ display: "flex", alignItems: "center" }}
+                variant="h5"
+                fontWeight={800}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  background:
+                    "linear-gradient(135deg, #FF6B35 0%, #264653 100%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
               >
                 🍔 EatUpNow
               </Typography>
@@ -185,7 +231,17 @@ export default function Navbar() {
                 flexGrow: 1,
               }}
             >
-              <Typography variant="h6" fontWeight={700} color="primary.main">
+              <Typography
+                variant="h6"
+                fontWeight={800}
+                sx={{
+                  background:
+                    "linear-gradient(135deg, #FF6B35 0%, #264653 100%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
                 🍔 EatUpNow
               </Typography>
             </Box>
@@ -197,14 +253,56 @@ export default function Navbar() {
               <Button
                 component={Link}
                 href="/food"
-                sx={{ color: "text.primary", mx: 1 }}
+                sx={{
+                  color: "text.primary",
+                  mx: 1,
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 0,
+                    height: 3,
+                    bgcolor: "primary.main",
+                    borderRadius: "2px 2px 0 0",
+                    transition: "width 0.3s ease",
+                  },
+                  "&:hover::after": {
+                    width: "80%",
+                  },
+                }}
               >
                 Food
               </Button>
               <Button
                 component={Link}
                 href="/restaurants"
-                sx={{ color: "text.primary", mx: 1 }}
+                sx={{
+                  color: "text.primary",
+                  mx: 1,
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 0,
+                    height: 3,
+                    bgcolor: "primary.main",
+                    borderRadius: "2px 2px 0 0",
+                    transition: "width 0.3s ease",
+                  },
+                  "&:hover::after": {
+                    width: "80%",
+                  },
+                }}
               >
                 Restaurants
               </Button>
@@ -212,7 +310,28 @@ export default function Navbar() {
                 <Button
                   component={Link}
                   href="/admin"
-                  sx={{ color: "text.primary", mx: 1 }}
+                  sx={{
+                    color: "text.primary",
+                    mx: 1,
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    position: "relative",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      bottom: 0,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 3,
+                      bgcolor: "primary.main",
+                      borderRadius: "2px 2px 0 0",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover::after": {
+                      width: "80%",
+                    },
+                  }}
                 >
                   Admin Panel
                 </Button>
@@ -221,7 +340,28 @@ export default function Navbar() {
                 <Button
                   component={Link}
                   href="/owner"
-                  sx={{ color: "text.primary", mx: 1 }}
+                  sx={{
+                    color: "text.primary",
+                    mx: 1,
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    position: "relative",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      bottom: 0,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 0,
+                      height: 3,
+                      bgcolor: "primary.main",
+                      borderRadius: "2px 2px 0 0",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover::after": {
+                      width: "80%",
+                    },
+                  }}
                 >
                   Owner Dashboard
                 </Button>
@@ -237,13 +377,62 @@ export default function Navbar() {
               )}
             </Box>
 
-            {/* Cart Icon */}
+            {/* Cart and Notifications Icons */}
+            {isAuthenticated && (
+              <IconButton
+                onClick={() => setNotificationsOpen(true)}
+                sx={{
+                  mr: 1,
+                  color: "primary.main",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    bgcolor: "rgba(255, 107, 53, 0.08)",
+                    transform: "scale(1.1)",
+                  },
+                }}
+              >
+                <Badge
+                  badgeContent={unreadCount}
+                  color="error"
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      fontSize: "0.7rem",
+                      height: 18,
+                      minWidth: 18,
+                      fontWeight: 700,
+                    },
+                  }}
+                >
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            )}
+
             <IconButton
               component={Link}
               href="/cart"
-              sx={{ mr: 2, color: "primary.main" }}
+              sx={{
+                mr: 2,
+                color: "primary.main",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  bgcolor: "rgba(255, 107, 53, 0.08)",
+                  transform: "scale(1.1)",
+                },
+              }}
             >
-              <Badge badgeContent={mounted ? getItemCount() : 0} color="error">
+              <Badge
+                badgeContent={mounted ? getItemCount() : 0}
+                color="error"
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.7rem",
+                    height: 18,
+                    minWidth: 18,
+                    fontWeight: 700,
+                  },
+                }}
+              >
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
@@ -275,6 +464,14 @@ export default function Navbar() {
                       }}
                     >
                       My Orders
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        router.push("/favorites");
+                        handleClose();
+                      }}
+                    >
+                      Favorites
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -336,6 +533,15 @@ export default function Navbar() {
                         My Orders
                       </MenuItem>,
                       <MenuItem
+                        key="favorites"
+                        onClick={() => {
+                          router.push("/favorites");
+                          handleClose();
+                        }}
+                      >
+                        Favorites
+                      </MenuItem>,
+                      <MenuItem
                         key="profile"
                         onClick={() => {
                           router.push("/profile");
@@ -374,6 +580,13 @@ export default function Navbar() {
         </Container>
       </AppBar>
       {mobileMenu}
+      <NotificationsPanel
+        open={notificationsOpen}
+        onClose={() => {
+          setNotificationsOpen(false);
+          fetchUnreadCount();
+        }}
+      />
     </>
   );
 }

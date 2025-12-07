@@ -19,6 +19,7 @@ import {
 import { AccessTime as AccessTimeIcon } from "@mui/icons-material";
 import { useParams } from "next/navigation";
 import MenuCard from "@/components/MenuCard";
+import ReviewSection from "@/components/ReviewSection";
 import apiClient from "@/lib/api";
 
 export default function RestaurantDetailPage() {
@@ -215,6 +216,9 @@ export default function RestaurantDetailPage() {
           </Typography>
         </Box>
       )}
+
+      {/* Reviews Section */}
+      <ReviewSection restaurantId={parseInt(restaurantId as string)} />
     </Container>
   );
 }

@@ -57,6 +57,8 @@ export default function FoodPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [vegFilter, setVegFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("name");
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -105,7 +107,7 @@ export default function FoodPage() {
       // Extract unique categories
       const uniqueCategories = Array.from(
         new Set(itemsWithRestaurant.map((item: MenuItem) => item.category))
-      );
+      ) as string[];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -139,7 +141,24 @@ export default function FoodPage() {
       item.restaurant?.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
       categoryFilter === "all" || item.category === categoryFilter;
-    return matchesSearch && matchesCategory && item.is_available;
+    const matchesVeg =
+      vegFilter === "all" ||
+      (vegFilter === "veg" && item.is_veg) ||
+      (vegFilter === "non-veg" && !item.is_veg);
+    return matchesSearch && matchesCategory && matchesVeg && item.is_available;
+  });
+
+  // Sort items
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "name":
+      default:
+        return a.name.localeCompare(b.name);
+    }
   });
 
   if (loading) {
@@ -174,7 +193,7 @@ export default function FoodPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ flexGrow: 1, minWidth: 250 }}
         />
-        <FormControl sx={{ minWidth: 200 }}>
+        <FormControl sx={{ minWidth: 150 }}>
           <InputLabel>Category</InputLabel>
           <Select
             value={categoryFilter}
@@ -189,23 +208,47 @@ export default function FoodPage() {
             ))}
           </Select>
         </FormControl>
+        <FormControl sx={{ minWidth: 150 }}>
+          <InputLabel>Type</InputLabel>
+          <Select
+            value={vegFilter}
+            label="Type"
+            onChange={(e) => setVegFilter(e.target.value)}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="veg">Veg Only</MenuItem>
+            <MenuItem value="non-veg">Non-Veg</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: 150 }}>
+          <InputLabel>Sort By</InputLabel>
+          <Select
+            value={sortBy}
+            label="Sort By"
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <MenuItem value="name">Name</MenuItem>
+            <MenuItem value="price-low">Price: Low to High</MenuItem>
+            <MenuItem value="price-high">Price: High to Low</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
       {/* Results Count */}
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Showing {filteredItems.length} items
+        Showing {sortedItems.length} items
       </Typography>
 
       {/* Menu Items Grid */}
-      {filteredItems.length === 0 ? (
+      {sortedItems.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 8 }}>
           <Typography variant="h6" color="text.secondary">
-            No items found
+            No items found matching your filters
           </Typography>
         </Box>
       ) : (
         <Grid container spacing={3}>
-          {filteredItems.map((item) => (
+          {sortedItems.map((item) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
               <Card
                 sx={{

@@ -28,10 +28,12 @@ export default function RestaurantsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("");
   const [cuisineFilter, setCuisineFilter] = useState("");
+  const [sortBy, setSortBy] = useState("rating");
+  const [minRating, setMinRating] = useState(0);
 
   useEffect(() => {
     fetchRestaurants();
-  }, [searchQuery, cityFilter, cuisineFilter]);
+  }, [searchQuery, cityFilter, cuisineFilter, minRating]);
 
   const fetchRestaurants = async () => {
     setLoading(true);
@@ -57,7 +59,27 @@ export default function RestaurantsPage() {
         };
       });
 
-      setRestaurants(processedRestaurants);
+      // Filter by minimum rating
+      const filteredRestaurants = processedRestaurants.filter(
+        (r: any) => r.rating >= minRating
+      );
+
+      // Sort restaurants
+      const sortedRestaurants = [...filteredRestaurants].sort(
+        (a: any, b: any) => {
+          switch (sortBy) {
+            case "rating":
+              return b.rating - a.rating;
+            case "delivery-time":
+              return a.delivery_time - b.delivery_time;
+            case "name":
+            default:
+              return a.name.localeCompare(b.name);
+          }
+        }
+      );
+
+      setRestaurants(sortedRestaurants);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
     } finally {
@@ -82,7 +104,7 @@ export default function RestaurantsPage() {
       {/* Filters */}
       <Box sx={{ mb: { xs: 3, md: 4 } }}>
         <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               fullWidth
               placeholder="Search restaurants..."
@@ -97,7 +119,7 @@ export default function RestaurantsPage() {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth>
               <InputLabel>City</InputLabel>
               <Select
@@ -113,7 +135,7 @@ export default function RestaurantsPage() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth>
               <InputLabel>Cuisine</InputLabel>
               <Select
@@ -127,6 +149,35 @@ export default function RestaurantsPage() {
                 <MenuItem value="Indian">Indian</MenuItem>
                 <MenuItem value="American">American</MenuItem>
                 <MenuItem value="Japanese">Japanese</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>Min Rating</InputLabel>
+              <Select
+                value={minRating}
+                label="Min Rating"
+                onChange={(e: any) => setMinRating(e.target.value)}
+              >
+                <MenuItem value={0}>All</MenuItem>
+                <MenuItem value={3}>3+ Stars</MenuItem>
+                <MenuItem value={4}>4+ Stars</MenuItem>
+                <MenuItem value={4.5}>4.5+ Stars</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>Sort By</InputLabel>
+              <Select
+                value={sortBy}
+                label="Sort By"
+                onChange={(e: any) => setSortBy(e.target.value)}
+              >
+                <MenuItem value="rating">Rating</MenuItem>
+                <MenuItem value="delivery-time">Delivery Time</MenuItem>
+                <MenuItem value="name">Name</MenuItem>
               </Select>
             </FormControl>
           </Grid>

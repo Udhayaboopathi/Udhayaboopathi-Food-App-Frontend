@@ -116,10 +116,13 @@ export default function LoginPage() {
             Test Credentials:
           </Typography>
           <Typography variant="caption" display="block">
-            User: john@example.com / password123
+            Customer: john.doe@example.com / password123
           </Typography>
           <Typography variant="caption" display="block">
-            Admin: admin@eatupnow.com / admin123
+            Admin: admin@foodapp.com / admin123
+          </Typography>
+          <Typography variant="caption" display="block">
+            Owner: owner.pizza@example.com / owner123
           </Typography>
         </Box>
       </Paper>

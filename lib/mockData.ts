@@ -2111,7 +2111,9 @@ export const mockAPI = {
 
   async getOwnerAnalytics(restaurantId: string) {
     return (
-      mockRestaurantAnalytics[restaurantId] || {
+      mockRestaurantAnalytics[
+        restaurantId as keyof typeof mockRestaurantAnalytics
+      ] || {
         restaurant_id: restaurantId,
         total_orders: 0,
         total_revenue: 0,

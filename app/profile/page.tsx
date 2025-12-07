@@ -43,14 +43,25 @@ import {
 import { useAuthStore } from "@/lib/authStore";
 import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
+import ImageCropUpload from "@/components/ImageCropUpload";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
   const [currentTab, setCurrentTab] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   // Profile data
   const [formData, setFormData] = useState({
@@ -84,6 +95,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
+    setMounted(true);
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -118,6 +130,13 @@ export default function ProfilePage() {
     } catch (err) {
       console.error("Failed to fetch payment methods:", err);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -209,9 +228,40 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  const handlePasswordChange = async () => {
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      await apiClient.put(`/users/${user?.id}/password`, {
+        old_password: passwordData.oldPassword,
+        new_password: passwordData.newPassword,
+      });
+      setPasswordSuccess("Password changed successfully!");
+      setTimeout(() => {
+        setPasswordDialogOpen(false);
+        setPasswordData({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }, 2000);
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.detail || "Failed to change password");
+    }
+  };
+
+  if (!mounted) return null;
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -276,7 +326,7 @@ export default function ProfilePage() {
 
       <Card>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleProfileUpdate}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <TextField

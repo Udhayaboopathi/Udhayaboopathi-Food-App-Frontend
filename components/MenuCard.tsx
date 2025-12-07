@@ -74,31 +74,60 @@ export default function MenuCard({
         display: "flex",
         height: "100%",
         flexDirection: { xs: "column", sm: "row" },
+        borderRadius: { xs: 3, sm: 4 },
+        overflow: "hidden",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        "&:hover": {
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          transform: "translateY(-2px)",
+        },
       }}
     >
       {image && (
-        <CardMedia
-          component="img"
+        <Box
           sx={{
-            width: { xs: "100%", sm: 140 },
-            height: { xs: 160, sm: "auto" },
-            objectFit: "cover",
+            position: "relative",
+            overflow: "hidden",
+            width: { xs: "100%", sm: 160 },
+            height: { xs: 180, sm: "auto" },
           }}
-          image={image}
-          alt={name}
-        />
-      )}
-      <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <CardContent sx={{ flex: "1 0 auto" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+        >
+          <CardMedia
+            component="img"
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.3s ease",
+            }}
+            image={image}
+            alt={name}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              left: 12,
+              bgcolor: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
+              borderRadius: 1,
+              p: 0.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          >
             <Box
               sx={{
-                width: 16,
-                height: 16,
+                width: 18,
+                height: 18,
                 border: `2px solid ${is_veg ? "#4CAF50" : "#F44336"}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                borderRadius: 0.5,
               }}
             >
               <Box
@@ -110,61 +139,157 @@ export default function MenuCard({
                 }}
               />
             </Box>
-            <Typography variant="h6" fontWeight={600}>
-              {name}
-            </Typography>
           </Box>
+        </Box>
+      )}
+      <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+        <CardContent sx={{ flex: "1 0 auto", p: { xs: 2, sm: 2.5 } }}>
+          {!image && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <Box
+                sx={{
+                  width: 18,
+                  height: 18,
+                  border: `2px solid ${is_veg ? "#4CAF50" : "#F44336"}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 0.5,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: is_veg ? "#4CAF50" : "#F44336",
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+
+          <Typography
+            variant="h6"
+            fontWeight={700}
+            sx={{
+              fontSize: { xs: "1.1rem", sm: "1.25rem" },
+              mb: 1,
+            }}
+          >
+            {name}
+          </Typography>
 
           {description && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mb: 1.5,
+                fontSize: { xs: "0.875rem", sm: "0.95rem" },
+                lineHeight: 1.6,
+              }}
+            >
               {description}
             </Typography>
           )}
 
-          <Chip label={category} size="small" sx={{ mb: 1 }} />
+          <Chip
+            label={category}
+            size="small"
+            sx={{
+              mb: 1.5,
+              bgcolor: "rgba(38, 70, 83, 0.08)",
+              color: "text.secondary",
+              fontWeight: 500,
+              fontSize: { xs: "0.75rem", sm: "0.8rem" },
+              border: "none",
+            }}
+          />
 
-          <Typography variant="h6" color="primary" fontWeight={700}>
+          <Typography
+            variant="h6"
+            fontWeight={700}
+            sx={{
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              background: "linear-gradient(135deg, #FF6B35 0%, #FF8A5C 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
             ${price.toFixed(2)}
           </Typography>
         </CardContent>
 
-        <Box sx={{ p: 2, pt: 0 }}>
+        <Box sx={{ p: { xs: 2, sm: 2.5 }, pt: 0 }}>
           {quantity === 0 ? (
             <Button
               variant="contained"
               fullWidth
               onClick={handleAdd}
               startIcon={<AddIcon />}
+              sx={{
+                py: { xs: 1, sm: 1.25 },
+                fontSize: { xs: "0.95rem", sm: "1rem" },
+                fontWeight: 600,
+                boxShadow: "0 4px 12px rgba(255,107,53,0.25)",
+                "&:hover": {
+                  boxShadow: "0 6px 20px rgba(255,107,53,0.35)",
+                  transform: "translateY(-2px)",
+                },
+              }}
             >
               Add to Cart
             </Button>
           ) : (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+                bgcolor: "rgba(255,107,53,0.08)",
+                borderRadius: 2,
+                p: 1,
+              }}
+            >
               <IconButton
                 onClick={handleDecrement}
-                color="primary"
                 size="small"
                 sx={{
-                  border: "2px solid",
-                  borderColor: "primary.main",
+                  bgcolor: "white",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  "&:hover": {
+                    bgcolor: "white",
+                    transform: "scale(1.1)",
+                  },
                 }}
               >
-                <RemoveIcon />
+                <RemoveIcon sx={{ color: "primary.main" }} />
               </IconButton>
               <Typography
                 variant="h6"
-                fontWeight={600}
-                sx={{ minWidth: 30, textAlign: "center" }}
+                fontWeight={700}
+                sx={{
+                  minWidth: 40,
+                  textAlign: "center",
+                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                }}
               >
                 {quantity}
               </Typography>
               <IconButton
                 onClick={handleIncrement}
-                color="primary"
                 size="small"
                 sx={{
-                  border: "2px solid",
-                  borderColor: "primary.main",
+                  bgcolor: "primary.main",
+                  color: "white",
+                  boxShadow: "0 2px 8px rgba(255,107,53,0.3)",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                    transform: "scale(1.1)",
+                  },
                 }}
               >
                 <AddIcon />

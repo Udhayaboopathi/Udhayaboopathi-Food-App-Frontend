@@ -1,7 +1,6 @@
 /**
  * Custom Material-UI Theme for EatUpNow
- * Brand colors: Deep Orange (#FF6B35) + Royal Blue (#264653)
- * Secondary: Off-white (#FFF8F2) + Lime accent (#C6FF00)
+ * Modern gradient design with innovative UI elements
  */
 "use client";
 
@@ -22,83 +21,111 @@ export const theme = createTheme({
       contrastText: "#FFFFFF",
     },
     success: {
-      main: "#C6FF00",
-      light: "#D4FF33",
-      dark: "#A3CC00",
-      contrastText: "#264653",
+      main: "#4CAF50",
+      light: "#66BB6A",
+      dark: "#388E3C",
+      contrastText: "#FFFFFF",
+    },
+    info: {
+      main: "#2196F3",
+      light: "#42A5F5",
+      dark: "#1976D2",
     },
     background: {
-      default: "#FFF8F2",
+      default: "#F8F9FA",
       paper: "#FFFFFF",
     },
     text: {
-      primary: "#264653",
-      secondary: "#5A7481",
+      primary: "#1A1A1A",
+      secondary: "#6B7280",
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily:
+      '"Inter", "SF Pro Display", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontWeight: 700,
-      fontSize: "2.5rem",
+      fontWeight: 800,
+      fontSize: "clamp(2rem, 5vw, 3.5rem)",
       letterSpacing: "-0.02em",
+      lineHeight: 1.2,
     },
     h2: {
       fontWeight: 700,
-      fontSize: "2rem",
+      fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
       letterSpacing: "-0.01em",
+      lineHeight: 1.3,
     },
     h3: {
-      fontWeight: 600,
-      fontSize: "1.75rem",
+      fontWeight: 700,
+      fontSize: "clamp(1.5rem, 3vw, 2rem)",
+      letterSpacing: "-0.01em",
+      lineHeight: 1.4,
     },
     h4: {
       fontWeight: 600,
-      fontSize: "1.5rem",
+      fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)",
+      lineHeight: 1.4,
     },
     h5: {
       fontWeight: 600,
-      fontSize: "1.25rem",
+      fontSize: "clamp(1.1rem, 2vw, 1.25rem)",
+      lineHeight: 1.5,
     },
     h6: {
       fontWeight: 600,
+      fontSize: "clamp(1rem, 1.5vw, 1.1rem)",
+      lineHeight: 1.5,
+    },
+    body1: {
       fontSize: "1rem",
+      lineHeight: 1.6,
+    },
+    body2: {
+      fontSize: "0.875rem",
+      lineHeight: 1.6,
     },
     button: {
-      textTransform: "none",
       fontWeight: 600,
+      textTransform: "none" as const,
+      letterSpacing: "0.02em",
     },
   },
   shape: {
-    borderRadius: 12,
+    borderRadius: 16,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 12,
           padding: "10px 24px",
+          fontSize: "1rem",
           boxShadow: "none",
+          transition: "all 0.3s ease",
           "&:hover": {
-            boxShadow: "0 4px 12px rgba(255, 107, 53, 0.25)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            transform: "translateY(-2px)",
           },
         },
-        contained: {
-          "&:hover": {
-            boxShadow: "0 6px 16px rgba(255, 107, 53, 0.35)",
-          },
+        sizeLarge: {
+          padding: "14px 32px",
+          fontSize: "1.1rem",
+        },
+        sizeSmall: {
+          padding: "6px 16px",
+          fontSize: "0.875rem",
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: "0 2px 12px rgba(38, 70, 83, 0.08)",
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          borderRadius: 20,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
           "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 8px 24px rgba(38, 70, 83, 0.12)",
+            boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
           },
         },
       },
@@ -107,7 +134,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           "& .MuiOutlinedInput-root": {
-            borderRadius: 8,
+            borderRadius: 12,
           },
         },
       },
@@ -116,7 +143,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          fontWeight: 600,
+          fontWeight: 500,
         },
       },
     },
