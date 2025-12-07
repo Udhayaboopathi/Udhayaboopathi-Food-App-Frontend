@@ -42,7 +42,22 @@ export default function RestaurantsPage() {
       if (cuisineFilter) params.append("cuisine", cuisineFilter);
 
       const response = await apiClient.get(`/restaurants?${params.toString()}`);
-      setRestaurants(response.data);
+
+      // Convert CSV string data to proper types
+      const processedRestaurants = response.data.map((restaurant: any) => {
+        console.log("Restaurant data:", restaurant);
+        return {
+          ...restaurant,
+          id: parseInt(restaurant.id),
+          rating: parseFloat(restaurant.rating),
+          // Extract first number from delivery_time range (e.g., "25-35" -> 25)
+          delivery_time: restaurant.delivery_time.toString().includes("-")
+            ? parseInt(restaurant.delivery_time.split("-")[0])
+            : parseInt(restaurant.delivery_time),
+        };
+      });
+
+      setRestaurants(processedRestaurants);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
     } finally {

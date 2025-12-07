@@ -44,8 +44,33 @@ export default function RestaurantDetailPage() {
         apiClient.get(`/menu/restaurant/${restaurantId}`),
       ]);
 
-      setRestaurant(restaurantRes.data);
-      setMenuItems(menuRes.data);
+      // Convert CSV string data to proper types
+      const restaurantData = restaurantRes.data;
+      const processedRestaurant = {
+        ...restaurantData,
+        rating:
+          typeof restaurantData.rating === "string"
+            ? parseFloat(restaurantData.rating)
+            : restaurantData.rating,
+        delivery_time:
+          typeof restaurantData.delivery_time === "string"
+            ? parseInt(restaurantData.delivery_time)
+            : restaurantData.delivery_time,
+      };
+
+      // Process menu items
+      const processedMenu = menuRes.data.map((item: any) => ({
+        ...item,
+        id: parseInt(item.id),
+        price: parseFloat(item.price),
+        restaurant_id: parseInt(item.restaurant_id),
+        is_veg: item.is_veg === "true" || item.is_veg === true,
+        is_available:
+          item.is_available === "true" || item.is_available === true,
+      }));
+
+      setRestaurant(processedRestaurant);
+      setMenuItems(processedMenu);
     } catch (error) {
       console.error("Error fetching restaurant data:", error);
     } finally {

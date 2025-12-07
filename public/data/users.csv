@@ -1,0 +1,13 @@
+id,email,name,password,phone,role,profile_image,is_active,wallet_balance,loyalty_points,restaurant_id
+user_001,john.doe@example.com,John Doe,password123,+1 (555) 123-4567,customer,https://i.pravatar.cc/150?img=12,true,125.50,450,
+user_002,jane.smith@example.com,Jane Smith,password123,+1 (555) 234-5678,customer,https://i.pravatar.cc/150?img=5,true,78.25,320,
+user_003,mike.wilson@example.com,Mike Wilson,password123,+1 (555) 345-6789,customer,https://i.pravatar.cc/150?img=33,true,250.00,890,
+user_004,sarah.johnson@example.com,Sarah Johnson,password123,+1 (555) 456-7890,customer,https://i.pravatar.cc/150?img=9,true,0.00,150,
+user_005,david.brown@example.com,David Brown,password123,+1 (555) 567-8901,customer,https://i.pravatar.cc/150?img=14,true,50.00,210,
+user_006,emily.davis@example.com,Emily Davis,password123,+1 (555) 678-9012,customer,https://i.pravatar.cc/150?img=20,true,180.75,560,
+user_007,chris.martinez@example.com,Chris Martinez,password123,+1 (555) 789-0123,customer,https://i.pravatar.cc/150?img=51,true,95.30,400,
+user_008,lisa.anderson@example.com,Lisa Anderson,password123,+1 (555) 890-1234,customer,https://i.pravatar.cc/150?img=25,true,310.00,720,
+admin_001,admin@foodapp.com,Admin User,admin123,+1 (555) 000-0001,admin,https://i.pravatar.cc/150?img=68,true,0.00,0,
+owner_001,owner.pizza@example.com,Pizza Palace Owner,owner123,+1 (555) 111-0001,owner,https://i.pravatar.cc/150?img=60,true,0.00,0,1
+owner_002,owner.burger@example.com,Burger Haven Owner,owner123,+1 (555) 111-0002,owner,https://i.pravatar.cc/150?img=61,true,0.00,0,2
+owner_003,owner.sushi@example.com,Sushi Express Owner,owner123,+1 (555) 111-0003,owner,https://i.pravatar.cc/150?img=62,true,0.00,0,3

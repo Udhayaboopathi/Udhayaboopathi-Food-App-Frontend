@@ -76,7 +76,22 @@ export default function AdminRestaurants() {
   const fetchRestaurants = async () => {
     try {
       const response = await apiClient.get("/admin/restaurants");
-      setRestaurants(response.data);
+
+      // Convert CSV string data to proper types
+      const processedRestaurants = response.data.map((restaurant: any) => ({
+        ...restaurant,
+        id: parseInt(restaurant.id),
+        rating: parseFloat(restaurant.rating),
+        // Extract first number from delivery_time range (e.g., "25-35" -> 25)
+        delivery_time: restaurant.delivery_time.toString().includes("-")
+          ? parseInt(restaurant.delivery_time.split("-")[0])
+          : parseInt(restaurant.delivery_time),
+        is_active:
+          restaurant.is_active === "true" || restaurant.is_active === true,
+        owner_id: restaurant.owner_id ? parseInt(restaurant.owner_id) : null,
+      }));
+
+      setRestaurants(processedRestaurants);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
     } finally {

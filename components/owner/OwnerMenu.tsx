@@ -66,7 +66,19 @@ export default function OwnerMenu() {
   const fetchMenuItems = async () => {
     try {
       const response = await apiClient.get("/owner/menu");
-      setMenuItems(response.data);
+
+      // Convert CSV string data to proper types
+      const processedItems = response.data.map((item: any) => ({
+        ...item,
+        id: parseInt(item.id),
+        price: parseFloat(item.price),
+        restaurant_id: parseInt(item.restaurant_id),
+        is_veg: item.is_veg === "true" || item.is_veg === true,
+        is_available:
+          item.is_available === "true" || item.is_available === true,
+      }));
+
+      setMenuItems(processedItems);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     } finally {

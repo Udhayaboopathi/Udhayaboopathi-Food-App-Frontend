@@ -66,32 +66,45 @@ export default function FoodPage() {
   const fetchAllMenuItems = async () => {
     try {
       setLoading(true);
-      // Fetch all restaurants
+      // Fetch all menu items directly
+      const menuResponse = await apiClient.get("/menu");
+      console.log("Menu response:", menuResponse.data);
+      const allMenuItems = menuResponse.data;
+
+      // Fetch restaurants to map names
       const restaurantsResponse = await apiClient.get("/restaurants");
+      console.log("Restaurants response:", restaurantsResponse.data);
       const restaurants = restaurantsResponse.data;
 
-      // Fetch menu items for each restaurant
-      const allMenuItems: MenuItem[] = [];
-      for (const restaurant of restaurants) {
-        const menuResponse = await apiClient.get(
-          `/menu/restaurant/${restaurant.id}`
-        );
-        const items = menuResponse.data.map((item: MenuItem) => ({
-          ...item,
-          restaurant: {
-            id: restaurant.id,
-            name: restaurant.name,
-            cuisine_type: restaurant.cuisine_type,
-          },
-        }));
-        allMenuItems.push(...items);
-      }
+      // Create restaurant lookup map
+      const restaurantMap = restaurants.reduce((acc: any, r: any) => {
+        acc[r.id] = { id: r.id, name: r.name, cuisine_type: r.cuisine };
+        return acc;
+      }, {});
 
-      setMenuItems(allMenuItems);
+      // Map restaurant data to menu items
+      const itemsWithRestaurant = allMenuItems.map((item: any) => ({
+        ...item,
+        id: parseInt(item.id),
+        price: parseFloat(item.price),
+        restaurant_id: parseInt(item.restaurant_id),
+        image_url: item.image,
+        is_veg: item.is_veg === "true" || item.is_veg === true,
+        is_available:
+          item.is_available === "true" || item.is_available === true,
+        restaurant: restaurantMap[item.restaurant_id] || {
+          id: item.restaurant_id,
+          name: "Unknown",
+          cuisine_type: "",
+        },
+      }));
+
+      console.log("Processed menu items:", itemsWithRestaurant);
+      setMenuItems(itemsWithRestaurant);
 
       // Extract unique categories
       const uniqueCategories = Array.from(
-        new Set(allMenuItems.map((item) => item.category))
+        new Set(itemsWithRestaurant.map((item: MenuItem) => item.category))
       );
       setCategories(uniqueCategories);
     } catch (error) {

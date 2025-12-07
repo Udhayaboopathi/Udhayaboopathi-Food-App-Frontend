@@ -1,0 +1,41 @@
+id,name,description,price,category,image,is_veg,restaurant_id,is_available
+1,Margherita Pizza,Classic pizza with tomato sauce and mozzarella,12.99,Pizza,https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop,true,1,true
+2,Pepperoni Pizza,Traditional pepperoni with extra cheese,14.99,Pizza,https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&h=300&fit=crop,false,1,true
+3,Veggie Supreme,Loaded with fresh vegetables and cheese,13.99,Pizza,https://images.unsplash.com/photo-1511689660979-10d2b1aada49?w=400&h=300&fit=crop,true,1,true
+4,BBQ Chicken Pizza,Chicken with BBQ sauce and red onions,15.99,Pizza,https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop,false,1,true
+5,Classic Burger,Beef patty with lettuce and tomato,9.99,Burger,https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop,false,2,true
+6,Cheese Burger,Double cheese with bacon,11.99,Burger,https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=400&h=300&fit=crop,false,2,true
+7,Bacon Burger,Crispy bacon with special sauce,12.99,Burger,https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=300&fit=crop,false,2,true
+8,Veggie Burger,Plant-based patty with avocado,10.99,Burger,https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=300&fit=crop,true,2,true
+9,California Roll,Crab and avocado wrapped in seaweed,8.99,Sushi,https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop,false,3,true
+10,Spicy Tuna Roll,Fresh tuna with spicy mayo,9.99,Sushi,https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&h=300&fit=crop,false,3,true
+11,Salmon Nigiri,Fresh salmon over seasoned rice,11.99,Sushi,https://images.unsplash.com/photo-1563612116625-3012372fccce?w=400&h=300&fit=crop,false,3,true
+12,Vegetable Tempura Roll,Crispy vegetables in sushi roll,7.99,Sushi,https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=400&h=300&fit=crop,true,3,true
+13,Chicken Tacos,Three soft tacos with grilled chicken,7.99,Tacos,https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop,false,4,true
+14,Beef Tacos,Seasoned ground beef tacos,8.99,Tacos,https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=300&fit=crop,false,4,true
+15,Fish Tacos,Grilled fish with cabbage slaw,9.99,Tacos,https://images.unsplash.com/photo-1512062768107-0dad8efe6ad9?w=400&h=300&fit=crop,false,4,true
+16,Veggie Tacos,Black beans and grilled vegetables,6.99,Tacos,https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=400&h=300&fit=crop,true,4,true
+17,Sweet and Sour Chicken,Crispy chicken in tangy sauce,11.99,Chinese,https://images.unsplash.com/photo-1626804475297-41608ea09aeb?w=400&h=300&fit=crop,false,5,true
+18,Fried Rice,Egg fried rice with vegetables,8.99,Chinese,https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop,true,5,true
+19,Kung Pao Chicken,Spicy chicken with peanuts,12.99,Chinese,https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=300&fit=crop,false,5,true
+20,Vegetable Chow Mein,Stir-fried noodles with vegetables,9.99,Chinese,https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop,true,5,true
+21,Spaghetti Carbonara,Creamy pasta with bacon,13.99,Pasta,https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop,false,6,true
+22,Fettuccine Alfredo,Rich and creamy Alfredo sauce,12.99,Pasta,https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=400&h=300&fit=crop,true,6,true
+23,Penne Arrabbiata,Spicy tomato sauce pasta,11.99,Pasta,https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop,true,6,true
+24,Lasagna,Layered pasta with meat sauce,14.99,Pasta,https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=400&h=300&fit=crop,false,6,true
+25,BBQ Ribs,Fall-off-the-bone tender ribs,16.99,BBQ,https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop,false,7,true
+26,Pulled Pork Sandwich,Slow-cooked pork with coleslaw,12.99,BBQ,https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400&h=300&fit=crop,false,7,true
+27,Brisket Plate,Smoked brisket with sides,18.99,BBQ,https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&h=300&fit=crop,false,7,true
+28,Grilled Chicken,BBQ grilled chicken breast,13.99,BBQ,https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop,false,7,true
+29,Pad Thai,Stir-fried noodles with peanuts,10.99,Thai,https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&h=300&fit=crop,false,8,true
+30,Green Curry,Spicy coconut curry with vegetables,11.99,Thai,https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&fit=crop,true,8,true
+31,Tom Yum Soup,Hot and sour Thai soup,8.99,Thai,https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400&h=300&fit=crop,false,8,true
+32,Mango Sticky Rice,Sweet coconut rice with mango,6.99,Thai,https://images.unsplash.com/photo-1596040033229-a0b5b8f94042?w=400&h=300&fit=crop,true,8,true
+33,Chicken Tikka Masala,Creamy tomato curry with chicken,12.99,Indian,https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop,false,9,true
+34,Naan Bread,Fresh baked Indian flatbread,2.99,Indian,https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop,true,9,true
+35,Palak Paneer,Spinach curry with cottage cheese,11.99,Indian,https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop,true,9,true
+36,Biryani Rice,Fragrant spiced rice with meat,13.99,Indian,https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&fit=crop,false,9,true
+37,Chicken Shawarma,Marinated chicken in pita bread,9.99,Mediterranean,https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&h=300&fit=crop,false,10,true
+38,Falafel Wrap,Crispy chickpea fritters in wrap,8.99,Mediterranean,https://images.unsplash.com/photo-1593858509729-7b1b6c3fe2f0?w=400&h=300&fit=crop,true,10,true
+39,Greek Salad,Fresh vegetables with feta cheese,7.99,Mediterranean,https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop,true,10,true
+40,Hummus Platter,Creamy hummus with pita bread,6.99,Mediterranean,https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop,true,10,true

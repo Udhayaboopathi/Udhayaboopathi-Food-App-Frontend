@@ -18,11 +18,11 @@ import { AccessTime as AccessTimeIcon } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
 interface RestaurantCardProps {
-  id: number;
+  id: number | string;
   name: string;
   cuisine: string;
-  rating: number;
-  delivery_time: number;
+  rating: number | string;
+  delivery_time: number | string;
   thumbnail?: string;
   city: string;
 }
@@ -37,6 +37,12 @@ export default function RestaurantCard({
   city,
 }: RestaurantCardProps) {
   const router = useRouter();
+
+  // Convert rating and delivery_time to numbers (handles CSV strings)
+  const numericRating =
+    typeof rating === "string" ? parseFloat(rating) : rating;
+  const numericDeliveryTime =
+    typeof delivery_time === "string" ? parseInt(delivery_time) : delivery_time;
 
   const handleClick = () => {
     router.push(`/restaurant/${id}`);
@@ -89,7 +95,7 @@ export default function RestaurantCard({
           }}
         >
           <Rating
-            value={rating}
+            value={numericRating}
             precision={0.1}
             size="small"
             readOnly
@@ -100,7 +106,7 @@ export default function RestaurantCard({
             color="text.secondary"
             sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
           >
-            {rating.toFixed(1)}
+            {numericRating.toFixed(1)}
           </Typography>
         </Box>
 
@@ -113,7 +119,7 @@ export default function RestaurantCard({
           />
           <Chip
             icon={<AccessTimeIcon />}
-            label={`${delivery_time} min`}
+            label={`${numericDeliveryTime} min`}
             size="small"
             variant="outlined"
           />
