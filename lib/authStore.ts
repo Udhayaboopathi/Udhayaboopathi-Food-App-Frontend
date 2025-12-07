@@ -16,6 +16,8 @@ interface User {
   role: string;
   profile_image?: string;
   is_active?: boolean;
+  restaurant_id?: string;
+  created_at?: string;
 }
 
 interface AuthState {
