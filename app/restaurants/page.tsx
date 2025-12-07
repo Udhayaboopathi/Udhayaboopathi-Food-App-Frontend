@@ -23,7 +23,7 @@ import RestaurantCard from "@/components/RestaurantCard";
 import apiClient from "@/lib/api";
 
 export default function RestaurantsPage() {
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("");
