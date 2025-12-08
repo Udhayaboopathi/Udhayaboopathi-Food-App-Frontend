@@ -39,6 +39,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { showError } = useToast();
 
   useEffect(() => {
     if (!isAuthenticated) {
