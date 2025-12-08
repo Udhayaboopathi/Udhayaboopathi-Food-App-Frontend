@@ -187,7 +187,9 @@ async function handleMockRequest(
   if (cleanUrl.match(/\/users\/(.+)\/addresses/)) {
     const userId = cleanUrl.match(/\/users\/(.+)\/addresses/)?.[1];
     if (method === "post") {
-      return await mockAPI.createAddress(data);
+      const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+      console.log("Creating address with data:", parsedData);
+      return await mockAPI.createAddress(parsedData);
     }
     return await mockAPI.getUserAddresses(userId!);
   }

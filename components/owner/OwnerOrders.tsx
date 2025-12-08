@@ -169,7 +169,7 @@ export default function OwnerOrders() {
                         Total Amount
                       </Typography>
                       <Typography variant="h6" color="primary">
-                        ${order.total_amount.toFixed(2)}
+                        ₹{order.total_amount.toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>

@@ -46,6 +46,7 @@ export default function RestaurantCard({
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -66,13 +67,23 @@ export default function RestaurantCard({
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Prevent multiple rapid clicks
+    if (isTogglingFavorite) return;
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
 
+    // Optimistic UI update - change immediately
+    const previousState = isFavorite;
+    setIsFavorite(!isFavorite);
+    setIsTogglingFavorite(true);
+
     try {
-      if (isFavorite) {
+      if (previousState) {
+        // Was favorite, now removing
         const response = await apiClient.get(`/users/${user?.id}/favorites`);
         const favorite = response.data.find(
           (fav: any) => fav.restaurant_id === id
@@ -81,13 +92,17 @@ export default function RestaurantCard({
           await apiClient.delete(`/favorites/${favorite.id}`);
         }
       } else {
+        // Adding to favorites
         await apiClient.post(`/users/${user?.id}/favorites`, {
           restaurant_id: id,
         });
       }
-      setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error toggling favorite:", error);
+      // Revert on error
+      setIsFavorite(previousState);
+    } finally {
+      setIsTogglingFavorite(false);
     }
   };
 
@@ -110,7 +125,7 @@ export default function RestaurantCard({
         display: "flex",
         flexDirection: "column",
         position: "relative",
-        borderRadius: { xs: 3, sm: 4 },
+        borderRadius: 2,
         overflow: "hidden",
         boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",

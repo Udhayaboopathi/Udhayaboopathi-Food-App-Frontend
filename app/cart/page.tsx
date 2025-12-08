@@ -107,7 +107,7 @@ export default function CartPage() {
                       fontWeight={700}
                       sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
                     >
-                      ${item.price.toFixed(2)}
+                      ₹{item.price.toFixed(2)}
                     </Typography>
                   </Box>
 
@@ -183,17 +183,26 @@ export default function CartPage() {
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Subtotal</Typography>
+                <Typography>Item Total</Typography>
                 <Typography fontWeight={600}>
-                  ${getTotal().toFixed(2)}
+                  ₹{getTotal().toFixed(2)}
                 </Typography>
               </Box>
 
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Delivery Fee</Typography>
-                <Typography fontWeight={600}>$2.99</Typography>
+                <Typography>Delivery Charges</Typography>
+                <Typography fontWeight={600}>₹49.00</Typography>
+              </Box>
+
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
+                <Typography>GST (5%)</Typography>
+                <Typography fontWeight={600}>
+                  ₹{(getTotal() * 0.05).toFixed(2)}
+                </Typography>
               </Box>
 
               <Divider sx={{ my: 2 }} />
@@ -202,10 +211,10 @@ export default function CartPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
               >
                 <Typography variant="h6" fontWeight={700}>
-                  Total
+                  Grand Total
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="primary">
-                  ${(getTotal() + 2.99).toFixed(2)}
+                  ₹{(getTotal() + 49 + getTotal() * 0.05).toFixed(2)}
                 </Typography>
               </Box>
 

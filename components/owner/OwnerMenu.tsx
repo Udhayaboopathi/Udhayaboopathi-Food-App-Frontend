@@ -195,7 +195,7 @@ export default function OwnerMenu() {
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
                   <Chip label={item.category} size="small" />
-                  <Chip label={`$${item.price.toFixed(2)}`} color="primary" />
+                  <Chip label={`₹${item.price.toFixed(2)}`} color="primary" />
                 </Box>
               </CardContent>
               <CardActions>

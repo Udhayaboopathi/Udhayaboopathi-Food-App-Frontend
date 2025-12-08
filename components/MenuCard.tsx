@@ -74,7 +74,7 @@ export default function MenuCard({
         display: "flex",
         height: "100%",
         flexDirection: { xs: "column", sm: "row" },
-        borderRadius: { xs: 3, sm: 4 },
+        borderRadius: 2,
         overflow: "hidden",
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -218,7 +218,7 @@ export default function MenuCard({
               WebkitTextFillColor: "transparent",
             }}
           >
-            ${price.toFixed(2)}
+            ₹{price.toFixed(2)}
           </Typography>
         </CardContent>
 

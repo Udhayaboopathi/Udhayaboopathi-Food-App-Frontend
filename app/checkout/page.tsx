@@ -84,34 +84,93 @@ export default function CheckoutPage() {
       const response = await apiClient.get(
         `/users/${user!.id}/payment-methods`
       );
-      setPaymentMethods(response.data);
-      // Add cash option
-      const cashOption = {
-        id: "cash",
-        type: "cash",
-        display_text: "Cash on Delivery",
-      };
-      setPaymentMethods([cashOption, ...response.data]);
-      setSelectedPayment(cashOption);
+
+      // Add default payment options
+      const defaultMethods = [
+        {
+          id: "cash",
+          type: "cash",
+          display_text: "Cash on Delivery",
+        },
+        {
+          id: "card_1",
+          type: "card",
+          last4: "4242",
+          display_text: "Credit/Debit Card",
+        },
+        {
+          id: "upi",
+          type: "upi",
+          display_text: "UPI",
+        },
+        {
+          id: "wallet",
+          type: "wallet",
+          display_text: "Digital Wallet",
+        },
+      ];
+
+      setPaymentMethods([...defaultMethods, ...response.data]);
+      setSelectedPayment(defaultMethods[0]);
     } catch (err) {
       console.error("Failed to fetch payment methods:", err);
-      // Set default cash option
-      const cashOption = {
-        id: "cash",
-        type: "cash",
-        display_text: "Cash on Delivery",
-      };
-      setPaymentMethods([cashOption]);
-      setSelectedPayment(cashOption);
+      // Set default payment options
+      const defaultMethods = [
+        {
+          id: "cash",
+          type: "cash",
+          display_text: "Cash on Delivery",
+        },
+        {
+          id: "card_1",
+          type: "card",
+          last4: "4242",
+          display_text: "Credit/Debit Card",
+        },
+        {
+          id: "upi",
+          type: "upi",
+          display_text: "UPI",
+        },
+        {
+          id: "wallet",
+          type: "wallet",
+          display_text: "Digital Wallet",
+        },
+      ];
+      setPaymentMethods(defaultMethods);
+      setSelectedPayment(defaultMethods[0]);
     }
   };
 
   const handleAddAddress = async () => {
     try {
-      const response = await apiClient.post(`/users/${user!.id}/addresses`, {
-        ...newAddress,
+      // Validate required fields
+      if (
+        !newAddress.street ||
+        !newAddress.city ||
+        !newAddress.state ||
+        !newAddress.zip_code
+      ) {
+        setError("Please fill in all required address fields");
+        return;
+      }
+
+      const addressData = {
         user_id: user!.id,
-      });
+        street: newAddress.street,
+        city: newAddress.city,
+        state: newAddress.state,
+        zip_code: newAddress.zip_code,
+        label: newAddress.label || "Home",
+        latitude: "0",
+        longitude: "0",
+      };
+
+      const response = await apiClient.post(
+        `/users/${user!.id}/addresses`,
+        addressData
+      );
       setAddresses([...addresses, response.data]);
       setSelectedAddress(response.data);
       setAddressDialogOpen(false);
@@ -122,8 +181,12 @@ export default function CheckoutPage() {
         zip_code: "",
         label: "Home",
       });
-    } catch (err) {
+      setError("");
+    } catch (err: any) {
       console.error("Failed to add address:", err);
+      setError(
+        err.response?.data?.detail || "Failed to add address. Please try again."
+      );
     }
   };
 
@@ -156,9 +219,14 @@ export default function CheckoutPage() {
 
   const getFinalTotal = () => {
     const subtotal = getTotal();
-    const deliveryFee = 2.99;
+    const deliveryFee = 49;
+    const gst = subtotal * 0.05; // 5% GST
     const discount = calculateDiscount();
-    return subtotal + deliveryFee - discount;
+    return subtotal + deliveryFee + gst - discount;
+  };
+
+  const getGST = () => {
+    return getTotal() * 0.05; // 5% GST
   };
 
   const handlePlaceOrder = async () => {
@@ -207,8 +275,14 @@ export default function CheckoutPage() {
     }
   };
 
+  // Redirect to cart if empty - wrapped in useEffect to avoid render-time navigation
+  useEffect(() => {
+    if (typeof window !== "undefined" && items.length === 0) {
+      router.push("/cart");
+    }
+  }, [items.length, router]);
+
   if (items.length === 0) {
-    router.push("/cart");
     return null;
   }
 
@@ -272,11 +346,17 @@ export default function CheckoutPage() {
                         label={
                           <Box>
                             <Typography fontWeight={600}>
-                              {address.label}
+                              {address.label || "Address"}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {address.street}, {address.city}, {address.state}{" "}
-                              {address.zip_code}
+                              {[
+                                address.street,
+                                address.city,
+                                address.state,
+                                address.zip_code,
+                              ]
+                                .filter(Boolean)
+                                .join(", ") || "No address details"}
                             </Typography>
                           </Box>
                         }
@@ -304,20 +384,47 @@ export default function CheckoutPage() {
                     setSelectedPayment(payment);
                   }}
                 >
-                  {paymentMethods.map((payment) => (
-                    <FormControlLabel
-                      key={payment.id}
-                      value={payment.id}
-                      control={<Radio />}
-                      label={
-                        payment.type === "cash"
-                          ? "Cash on Delivery"
-                          : `${payment.type.toUpperCase()} ending in ${
-                              payment.last4 || "****"
-                            }`
-                      }
-                    />
-                  ))}
+                  {paymentMethods.map((payment) => {
+                    let label = "";
+                    if (payment.type === "cash") {
+                      label = "💵 Cash on Delivery";
+                    } else if (payment.type === "card") {
+                      label = `💳 Credit/Debit Card ${
+                        payment.last4 ? `ending in ${payment.last4}` : ""
+                      }`;
+                    } else if (payment.type === "upi") {
+                      label = "📱 UPI (Google Pay, PhonePe, Paytm)";
+                    } else if (payment.type === "wallet") {
+                      label = "👛 Digital Wallet (Paytm, Amazon Pay)";
+                    } else {
+                      label =
+                        payment.display_text || payment.type.toUpperCase();
+                    }
+
+                    return (
+                      <FormControlLabel
+                        key={payment.id}
+                        value={payment.id}
+                        control={<Radio />}
+                        label={label}
+                        sx={{
+                          mb: 1,
+                          p: 1.5,
+                          border: "1px solid",
+                          borderColor:
+                            selectedPayment?.id === payment.id
+                              ? "primary.main"
+                              : "grey.300",
+                          borderRadius: 2,
+                          transition: "all 0.2s",
+                          "&:hover": {
+                            borderColor: "primary.main",
+                            bgcolor: "action.hover",
+                          },
+                        }}
+                      />
+                    );
+                  })}
                 </RadioGroup>
               </FormControl>
             </CardContent>
@@ -391,7 +498,7 @@ export default function CheckoutPage() {
                     {item.name} x {item.quantity}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(2)}
                   </Typography>
                 </Box>
               ))}
@@ -401,17 +508,24 @@ export default function CheckoutPage() {
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Subtotal</Typography>
+                <Typography>Item Total</Typography>
                 <Typography fontWeight={600}>
-                  ${getTotal().toFixed(2)}
+                  ₹{getTotal().toFixed(2)}
                 </Typography>
               </Box>
 
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Delivery Fee</Typography>
-                <Typography fontWeight={600}>$2.99</Typography>
+                <Typography>Delivery Charges</Typography>
+                <Typography fontWeight={600}>₹49.00</Typography>
+              </Box>
+
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
+                <Typography>GST (5%)</Typography>
+                <Typography fontWeight={600}>₹{getGST().toFixed(2)}</Typography>
               </Box>
 
               {appliedCoupon && (
@@ -424,7 +538,7 @@ export default function CheckoutPage() {
                 >
                   <Typography color="success.main">Discount</Typography>
                   <Typography color="success.main" fontWeight={600}>
-                    -${calculateDiscount().toFixed(2)}
+                    -₹{calculateDiscount().toFixed(2)}
                   </Typography>
                 </Box>
               )}
@@ -433,10 +547,10 @@ export default function CheckoutPage() {
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="h6" fontWeight={700}>
-                  Total
+                  Grand Total
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="primary">
-                  ${getFinalTotal().toFixed(2)}
+                  ₹{getFinalTotal().toFixed(2)}
                 </Typography>
               </Box>
 
@@ -448,7 +562,9 @@ export default function CheckoutPage() {
                 disabled={loading || !selectedAddress || !selectedPayment}
                 sx={{ mt: 3 }}
               >
-                {loading ? "Placing Order..." : "Place Order"}
+                {loading
+                  ? "Placing Order..."
+                  : "Pay ₹" + getFinalTotal().toFixed(2)}
               </Button>
             </CardContent>
           </Card>
@@ -505,13 +621,15 @@ export default function CheckoutPage() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="ZIP Code"
+                  label="PIN Code"
                   value={newAddress.zip_code}
                   onChange={(e) =>
                     setNewAddress({ ...newAddress, zip_code: e.target.value })
                   }
                   fullWidth
                   required
+                  inputProps={{ maxLength: 6 }}
+                  placeholder="e.g., 600001"
                 />
               </Grid>
             </Grid>

@@ -319,7 +319,7 @@ export default function FoodPage() {
                     )}
                   </Box>
                   <Typography variant="h6" color="primary">
-                    ${item.price.toFixed(2)}
+                    ₹{item.price.toFixed(2)}
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ p: 2, pt: 0 }}>

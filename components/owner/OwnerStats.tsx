@@ -66,7 +66,7 @@ export default function OwnerStats() {
     },
     {
       title: "Total Revenue",
-      value: `$${stats.total_revenue.toFixed(2)}`,
+      value: `₹${stats.total_revenue.toFixed(2)}`,
       icon: <RevenueIcon sx={{ fontSize: 40 }} />,
       color: "#9c27b0",
     },

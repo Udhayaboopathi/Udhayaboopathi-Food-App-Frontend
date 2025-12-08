@@ -190,7 +190,7 @@ export default function OrdersPage() {
                         Total Amount
                       </Typography>
                       <Typography variant="h6" color="primary" fontWeight={700}>
-                        ${order.total_amount.toFixed(2)}
+                        ₹{order.total_amount.toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -218,7 +218,7 @@ export default function OrdersPage() {
                             {item.quantity}x {item.menu_item?.name || "Item"}
                           </Typography>
                           <Typography variant="body2" fontWeight={600}>
-                            $
+                            ₹
                             {(item.price_at_purchase * item.quantity).toFixed(
                               2
                             )}
