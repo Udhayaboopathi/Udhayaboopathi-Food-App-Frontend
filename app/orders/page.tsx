@@ -40,6 +40,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { showError } = useToast();
+  const { addMultipleItems } = useCartStore();
 
   useEffect(() => {
     if (!isAuthenticated) {
