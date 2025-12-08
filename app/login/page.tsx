@@ -42,9 +42,21 @@ export default function LoginPage() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom align="center">
+    <Container
+      maxWidth="sm"
+      sx={{ py: { xs: 4, sm: 6, md: 8 }, px: { xs: 2, sm: 3 } }}
+    >
+      <Paper
+        elevation={3}
+        sx={{ p: { xs: 2.5, sm: 3.5, md: 4 }, borderRadius: 3 }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          gutterBottom
+          align="center"
+          sx={{ fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" } }}
+        >
           Welcome Back
         </Typography>
         <Typography

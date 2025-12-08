@@ -44,6 +44,7 @@ import { useAuthStore } from "@/lib/authStore";
 import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
 import ImageCropUpload from "@/components/ImageCropUpload";
+import LoyaltyPoints from "@/components/LoyaltyPoints";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -268,12 +269,28 @@ export default function ProfilePage() {
   if (!mounted) return null;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
+    <Container
+      maxWidth="md"
+      sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3 } }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: { xs: 2, sm: 3 },
+          mb: { xs: 3, sm: 4 },
+          flexDirection: { xs: "column", sm: "row" },
+          textAlign: { xs: "center", sm: "left" },
+        }}
+      >
         <Box sx={{ position: "relative" }}>
           <Avatar
             src={profileImage || undefined}
-            sx={{ width: 100, height: 100, bgcolor: "primary.main" }}
+            sx={{
+              width: { xs: 80, sm: 100 },
+              height: { xs: 80, sm: 100 },
+              bgcolor: "primary.main",
+            }}
           >
             {!profileImage && <PersonIcon sx={{ fontSize: 54 }} />}
           </Avatar>
@@ -307,13 +324,22 @@ export default function ProfilePage() {
           </Box>
         </Box>
         <Box>
-          <Typography variant="h4" fontWeight={700}>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            sx={{ fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" } }}
+          >
             My Profile
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Manage your account information
           </Typography>
         </Box>
+      </Box>
+
+      {/* Loyalty Points Card */}
+      <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+        <LoyaltyPoints userId={user?.id} variant="compact" />
       </Box>
 
       {success && (
@@ -329,9 +355,9 @@ export default function ProfilePage() {
       )}
 
       <Card>
-        <CardContent>
+        <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
           <form onSubmit={handleProfileUpdate}>
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth

@@ -162,7 +162,10 @@ export default function CartPage() {
             variant="outlined"
             color="error"
             onClick={clearCart}
-            sx={{ mt: 2 }}
+            sx={{
+              mt: { xs: 1.5, sm: 2 },
+              fontSize: { xs: "0.875rem", sm: "0.95rem" },
+            }}
           >
             Clear Cart
           </Button>
@@ -173,8 +176,13 @@ export default function CartPage() {
           <Card
             sx={{ position: { xs: "relative", md: "sticky" }, top: { md: 80 } }}
           >
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} gutterBottom>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                gutterBottom
+                sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+              >
                 Order Summary
               </Typography>
 

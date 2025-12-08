@@ -16,15 +16,22 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  Button,
 } from "@mui/material";
 import {
   CheckCircle as CheckCircleIcon,
   LocalShipping as ShippingIcon,
   Restaurant as RestaurantIcon,
+  Visibility,
+  Refresh,
+  Star,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/authStore";
+import { useCartStore } from "@/lib/cartStore";
 import apiClient from "@/lib/api";
+import ReviewDialog from "@/components/ReviewDialog";
+import { useToast } from "@/components/ToastProvider";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -94,6 +101,34 @@ export default function OrdersPage() {
       default:
         return <RestaurantIcon />;
     }
+  };
+
+  const handleReorder = (order: any) => {
+    if (!order.items || order.items.length === 0) {
+      showError("No items found in this order");
+      return;
+    }
+
+    // Convert order items to cart items
+    const cartItems = order.items.map((item: any) => ({
+      id: item.menu_item_id,
+      name: item.menu_item?.name || "Item",
+      price: item.price_at_purchase,
+      quantity: item.quantity,
+      restaurant_id: order.restaurant_id,
+      restaurant_name: order.restaurant_name || "Restaurant",
+      image: item.menu_item?.image,
+      is_veg: item.menu_item?.is_veg || false,
+    }));
+
+    addMultipleItems(cartItems);
+    showSuccess(
+      `${cartItems.length} ${
+        cartItems.length === 1 ? "item" : "items"
+      } added to cart!`,
+      "Order Added"
+    );
+    router.push("/cart");
   };
 
   if (loading) {
@@ -227,11 +262,71 @@ export default function OrdersPage() {
                       ))}
                     </>
                   )}
+
+                  {/* Action Buttons */}
+                  <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+                    {(order.status === "placed" ||
+                      order.status === "preparing" ||
+                      order.status === "out_for_delivery") && (
+                      <Button
+                        variant="contained"
+                        startIcon={<Visibility />}
+                        onClick={() => router.push(`/track/${order.id}`)}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Track Order
+                      </Button>
+                    )}
+                    {order.status === "delivered" && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<Refresh />}
+                        onClick={() => handleReorder(order)}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Reorder
+                      </Button>
+                    )}
+                    {order.status === "delivered" && (
+                      <Button
+                        variant="contained"
+                        startIcon={<Star />}
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setReviewDialogOpen(true);
+                        }}
+                        sx={{ borderRadius: 2 }}
+                        color="secondary"
+                      >
+                        Rate Order
+                      </Button>
+                    )}
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
           ))}
         </Grid>
+      )}
+
+      {/* Review Dialog */}
+      {selectedOrder && (
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onClose={() => {
+            setReviewDialogOpen(false);
+            setSelectedOrder(null);
+          }}
+          orderId={selectedOrder.id}
+          restaurantId={selectedOrder.restaurant_id}
+          restaurantName={selectedOrder.restaurant_name || "Restaurant"}
+          items={
+            selectedOrder.items?.map((item: any) => ({
+              id: item.menu_item_id,
+              name: item.menu_item?.name || "Item",
+            })) || []
+          }
+        />
       )}
     </Container>
   );

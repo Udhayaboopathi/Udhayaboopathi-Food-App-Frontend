@@ -10,44 +10,41 @@ import {
   Grid,
   Typography,
   Box,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  InputAdornment,
   CircularProgress,
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
 import RestaurantCard from "@/components/RestaurantCard";
+import SearchFilters, { FilterOptions } from "@/components/SearchFilters";
 import apiClient from "@/lib/api";
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [allRestaurants, setAllRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cityFilter, setCityFilter] = useState("");
-  const [cuisineFilter, setCuisineFilter] = useState("");
-  const [sortBy, setSortBy] = useState("rating");
-  const [minRating, setMinRating] = useState(0);
+  const [filters, setFilters] = useState<FilterOptions>({
+    cuisines: [],
+    priceRange: [0, 500],
+    rating: 0,
+    deliveryTime: 60,
+    dietary: [],
+    sortBy: "relevance",
+  });
 
   useEffect(() => {
     fetchRestaurants();
-  }, [searchQuery, cityFilter, cuisineFilter, minRating]);
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, filters, allRestaurants]);
 
   const fetchRestaurants = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
-      if (cityFilter) params.append("city", cityFilter);
-      if (cuisineFilter) params.append("cuisine", cuisineFilter);
-
-      const response = await apiClient.get(`/restaurants?${params.toString()}`);
+      const response = await apiClient.get("/restaurants");
 
       // Convert CSV string data to proper types
       const processedRestaurants = response.data.map((restaurant: any) => {
-        console.log("Restaurant data:", restaurant);
         return {
           ...restaurant,
           id: parseInt(restaurant.id),
@@ -59,32 +56,72 @@ export default function RestaurantsPage() {
         };
       });
 
-      // Filter by minimum rating
-      const filteredRestaurants = processedRestaurants.filter(
-        (r: any) => r.rating >= minRating
-      );
-
-      // Sort restaurants
-      const sortedRestaurants = [...filteredRestaurants].sort(
-        (a: any, b: any) => {
-          switch (sortBy) {
-            case "rating":
-              return b.rating - a.rating;
-            case "delivery-time":
-              return a.delivery_time - b.delivery_time;
-            case "name":
-            default:
-              return a.name.localeCompare(b.name);
-          }
-        }
-      );
-
-      setRestaurants(sortedRestaurants);
+      setAllRestaurants(processedRestaurants);
+      setRestaurants(processedRestaurants);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...allRestaurants];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (r: any) =>
+          r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.address.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Cuisine filter
+    if (filters.cuisines.length > 0) {
+      filtered = filtered.filter((r: any) =>
+        filters.cuisines.some((cuisine) =>
+          r.cuisine.toLowerCase().includes(cuisine.toLowerCase())
+        )
+      );
+    }
+
+    // Rating filter
+    if (filters.rating > 0) {
+      filtered = filtered.filter((r: any) => r.rating >= filters.rating);
+    }
+
+    // Delivery time filter
+    if (filters.deliveryTime < 60) {
+      filtered = filtered.filter(
+        (r: any) => r.delivery_time <= filters.deliveryTime
+      );
+    }
+
+    // Sort
+    filtered.sort((a: any, b: any) => {
+      switch (filters.sortBy) {
+        case "rating":
+          return b.rating - a.rating;
+        case "delivery-time":
+          return a.delivery_time - b.delivery_time;
+        case "name":
+          return a.name.localeCompare(b.name);
+        default: // relevance
+          return b.rating - a.rating;
+      }
+    });
+
+    setRestaurants(filtered);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
   };
 
   return (
@@ -96,93 +133,16 @@ export default function RestaurantsPage() {
         variant="h4"
         fontWeight={700}
         gutterBottom
-        sx={{ fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" } }}
+        sx={{ fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" }, mb: 3 }}
       >
         All Restaurants
       </Typography>
 
-      {/* Filters */}
-      <Box sx={{ mb: { xs: 3, md: 4 } }}>
-        <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              placeholder="Search restaurants..."
-              value={searchQuery}
-              onChange={(e: any) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>City</InputLabel>
-              <Select
-                value={cityFilter}
-                label="City"
-                onChange={(e: any) => setCityFilter(e.target.value)}
-              >
-                <MenuItem value="">All Cities</MenuItem>
-                <MenuItem value="New York">New York</MenuItem>
-                <MenuItem value="Los Angeles">Los Angeles</MenuItem>
-                <MenuItem value="Chicago">Chicago</MenuItem>
-                <MenuItem value="San Francisco">San Francisco</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>Cuisine</InputLabel>
-              <Select
-                value={cuisineFilter}
-                label="Cuisine"
-                onChange={(e: any) => setCuisineFilter(e.target.value)}
-              >
-                <MenuItem value="">All Cuisines</MenuItem>
-                <MenuItem value="Italian">Italian</MenuItem>
-                <MenuItem value="Chinese">Chinese</MenuItem>
-                <MenuItem value="Indian">Indian</MenuItem>
-                <MenuItem value="American">American</MenuItem>
-                <MenuItem value="Japanese">Japanese</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>Min Rating</InputLabel>
-              <Select
-                value={minRating}
-                label="Min Rating"
-                onChange={(e: any) => setMinRating(e.target.value)}
-              >
-                <MenuItem value={0}>All</MenuItem>
-                <MenuItem value={3}>3+ Stars</MenuItem>
-                <MenuItem value={4}>4+ Stars</MenuItem>
-                <MenuItem value={4.5}>4.5+ Stars</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>Sort By</InputLabel>
-              <Select
-                value={sortBy}
-                label="Sort By"
-                onChange={(e: any) => setSortBy(e.target.value)}
-              >
-                <MenuItem value="rating">Rating</MenuItem>
-                <MenuItem value="delivery-time">Delivery Time</MenuItem>
-                <MenuItem value="name">Name</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Box>
+      {/* Search and Filters */}
+      <SearchFilters
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Results */}
       {loading ? (
@@ -190,19 +150,35 @@ export default function RestaurantsPage() {
           <CircularProgress />
         </Box>
       ) : (
-        <Grid container spacing={3}>
-          {restaurants.map((restaurant: any) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={restaurant.id}>
-              <RestaurantCard {...restaurant} />
-            </Grid>
-          ))}
-        </Grid>
+        <>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: { xs: 1.5, sm: 2 },
+              fontSize: { xs: "0.875rem", sm: "0.95rem" },
+            }}
+          >
+            {restaurants.length}{" "}
+            {restaurants.length === 1 ? "restaurant" : "restaurants"} found
+          </Typography>
+          <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+            {restaurants.map((restaurant: any) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={restaurant.id}>
+                <RestaurantCard {...restaurant} />
+              </Grid>
+            ))}
+          </Grid>
+        </>
       )}
 
       {!loading && restaurants.length === 0 && (
         <Box sx={{ textAlign: "center", py: 8 }}>
           <Typography variant="h6" color="text.secondary">
             No restaurants found
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Try adjusting your filters or search query
           </Typography>
         </Box>
       )}

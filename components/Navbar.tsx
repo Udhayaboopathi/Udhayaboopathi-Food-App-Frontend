@@ -168,7 +168,10 @@ export default function Navbar() {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: { xs: 60, sm: 70 } }}>
+          <Toolbar
+            disableGutters
+            sx={{ minHeight: { xs: 56, sm: 64, md: 70 }, px: { xs: 1, sm: 2 } }}
+          >
             {/* Mobile Menu Icon */}
             <IconButton
               color="inherit"
@@ -176,15 +179,16 @@ export default function Navbar() {
               edge="start"
               onClick={handleDrawerToggle}
               sx={{
-                mr: 2,
+                mr: { xs: 1, sm: 2 },
                 display: { xs: "block", md: "none" },
                 color: "primary.main",
+                p: { xs: 1, sm: 1.5 },
                 "&:hover": {
                   bgcolor: "rgba(255, 107, 53, 0.08)",
                 },
               }}
             >
-              <MenuIcon />
+              <MenuIcon fontSize="medium" />
             </IconButton>
 
             {/* Logo */}
@@ -192,10 +196,10 @@ export default function Navbar() {
               component={Link}
               href="/"
               sx={{
-                display: { xs: "none", md: "flex" },
+                display: { xs: "flex", md: "flex" },
                 alignItems: "center",
                 textDecoration: "none",
-                mr: 2,
+                mr: { xs: "auto", md: 2 },
                 transition: "transform 0.2s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
@@ -209,6 +213,7 @@ export default function Navbar() {
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
                   background:
                     "linear-gradient(135deg, #FF6B35 0%, #264653 100%)",
                   backgroundClip: "text",
@@ -216,33 +221,13 @@ export default function Navbar() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                🍔 EatUpNow
-              </Typography>
-            </Box>
-
-            {/* Mobile Logo */}
-            <Box
-              component={Link}
-              href="/"
-              sx={{
-                display: { xs: "flex", md: "none" },
-                alignItems: "center",
-                textDecoration: "none",
-                flexGrow: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                fontWeight={800}
-                sx={{
-                  background:
-                    "linear-gradient(135deg, #FF6B35 0%, #264653 100%)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                🍔 EatUpNow
+                🍔{" "}
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  EatUpNow
+                </Box>
               </Typography>
             </Box>
 

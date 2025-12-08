@@ -288,7 +288,15 @@ export default function CheckoutPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
-      <Typography variant="h4" fontWeight={700} gutterBottom>
+      <Typography
+        variant="h4"
+        fontWeight={700}
+        gutterBottom
+        sx={{
+          fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
+          mb: { xs: 2, sm: 3 },
+        }}
+      >
         Checkout
       </Typography>
 
@@ -298,26 +306,33 @@ export default function CheckoutPage() {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid item xs={12} md={8}>
           {/* Delivery Address */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
+          <Card sx={{ mb: { xs: 2, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  mb: 2,
+                  mb: { xs: 1.5, sm: 2 },
+                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                  gap: { xs: 1, sm: 0 },
                 }}
               >
-                <Typography variant="h6" fontWeight={700}>
+                <Typography
+                  variant="h6"
+                  fontWeight={700}
+                  sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+                >
                   Delivery Address
                 </Typography>
                 <Button
                   startIcon={<AddIcon />}
                   onClick={() => setAddressDialogOpen(true)}
                   size="small"
+                  sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
                 >
                   Add New
                 </Button>
@@ -369,9 +384,14 @@ export default function CheckoutPage() {
           </Card>
 
           {/* Payment Method */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} gutterBottom>
+          <Card sx={{ mb: { xs: 2, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                gutterBottom
+                sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+              >
                 Payment Method
               </Typography>
               <FormControl component="fieldset" fullWidth>
@@ -432,11 +452,22 @@ export default function CheckoutPage() {
 
           {/* Coupon Code */}
           <Card>
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} gutterBottom>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                gutterBottom
+                sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+              >
                 Promo Code
               </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: { xs: 0.5, sm: 1 },
+                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                }}
+              >
                 <TextField
                   fullWidth
                   placeholder="Enter coupon code"
@@ -444,6 +475,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                   disabled={!!appliedCoupon}
                   size="small"
+                  sx={{ minWidth: { xs: "100%", sm: "auto" } }}
                 />
                 {appliedCoupon ? (
                   <Button
@@ -480,8 +512,13 @@ export default function CheckoutPage() {
         {/* Order Summary */}
         <Grid item xs={12} md={4}>
           <Card sx={{ position: { md: "sticky" }, top: { md: 80 } }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} gutterBottom>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                gutterBottom
+                sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+              >
                 Order Summary
               </Typography>
 
@@ -508,8 +545,17 @@ export default function CheckoutPage() {
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Item Total</Typography>
-                <Typography fontWeight={600}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
+                >
+                  Item Total
+                </Typography>
+                <Typography
+                  fontWeight={600}
+                  variant="body2"
+                  sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
+                >
                   ₹{getTotal().toFixed(2)}
                 </Typography>
               </Box>

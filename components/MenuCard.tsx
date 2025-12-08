@@ -42,6 +42,7 @@ export default function MenuCard({
   restaurant_name,
 }: MenuCardProps) {
   const { items, addItem, updateQuantity } = useCartStore();
+  const [imageError, setImageError] = React.useState(false);
 
   const cartItem = items.find((item: CartItem) => item.id === id);
   const quantity = cartItem?.quantity || 0;
@@ -68,12 +69,14 @@ export default function MenuCard({
     updateQuantity(id, quantity - 1);
   };
 
+  const showImage = image && !imageError;
+
   return (
     <Card
       sx={{
         display: "flex",
         height: "100%",
-        flexDirection: { xs: "column", sm: "row" },
+        flexDirection: "column",
         borderRadius: 2,
         overflow: "hidden",
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
@@ -84,13 +87,13 @@ export default function MenuCard({
         },
       }}
     >
-      {image && (
+      {showImage && (
         <Box
           sx={{
             position: "relative",
             overflow: "hidden",
-            width: { xs: "100%", sm: 160 },
-            height: { xs: 180, sm: "auto" },
+            width: "100%",
+            height: 200,
           }}
         >
           <CardMedia
@@ -101,8 +104,9 @@ export default function MenuCard({
               objectFit: "cover",
               transition: "transform 0.3s ease",
             }}
-            image={image}
+            src={image}
             alt={name}
+            onError={() => setImageError(true)}
           />
           <Box
             sx={{
@@ -143,8 +147,8 @@ export default function MenuCard({
         </Box>
       )}
       <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <CardContent sx={{ flex: "1 0 auto", p: { xs: 2, sm: 2.5 } }}>
-          {!image && (
+        <CardContent sx={{ flex: "1 0 auto", p: 2 }}>
+          {!showImage && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Box
                 sx={{
@@ -173,8 +177,13 @@ export default function MenuCard({
             variant="h6"
             fontWeight={700}
             sx={{
-              fontSize: { xs: "1.1rem", sm: "1.25rem" },
+              fontSize: "1rem",
               mb: 1,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {name}
@@ -186,8 +195,13 @@ export default function MenuCard({
               color="text.secondary"
               sx={{
                 mb: 1.5,
-                fontSize: { xs: "0.875rem", sm: "0.95rem" },
-                lineHeight: 1.6,
+                fontSize: "0.875rem",
+                lineHeight: 1.5,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
               }}
             >
               {description}
@@ -202,7 +216,7 @@ export default function MenuCard({
               bgcolor: "rgba(38, 70, 83, 0.08)",
               color: "text.secondary",
               fontWeight: 500,
-              fontSize: { xs: "0.75rem", sm: "0.8rem" },
+              fontSize: "0.75rem",
               border: "none",
             }}
           />
@@ -211,7 +225,7 @@ export default function MenuCard({
             variant="h6"
             fontWeight={700}
             sx={{
-              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              fontSize: "1.25rem",
               background: "linear-gradient(135deg, #FF6B35 0%, #FF8A5C 100%)",
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
@@ -222,7 +236,7 @@ export default function MenuCard({
           </Typography>
         </CardContent>
 
-        <Box sx={{ p: { xs: 2, sm: 2.5 }, pt: 0 }}>
+        <Box sx={{ p: 2, pt: 0 }}>
           {quantity === 0 ? (
             <Button
               variant="contained"
@@ -230,9 +244,10 @@ export default function MenuCard({
               onClick={handleAdd}
               startIcon={<AddIcon />}
               sx={{
-                py: { xs: 1, sm: 1.25 },
-                fontSize: { xs: "0.95rem", sm: "1rem" },
+                py: 1,
+                fontSize: "0.95rem",
                 fontWeight: 600,
+                borderRadius: 2,
                 boxShadow: "0 4px 12px rgba(255,107,53,0.25)",
                 "&:hover": {
                   boxShadow: "0 6px 20px rgba(255,107,53,0.35)",

@@ -93,8 +93,11 @@ export default function HomePage() {
               variant="h1"
               gutterBottom
               sx={{
+                fontSize: { xs: "2rem", sm: "3rem", md: "3.75rem" },
+                fontWeight: { xs: 700, md: 800 },
                 textShadow: "0 2px 20px rgba(0,0,0,0.2)",
-                mb: 2,
+                mb: { xs: 1.5, sm: 2 },
+                lineHeight: 1.2,
               }}
             >
               Delicious Food,
@@ -104,10 +107,12 @@ export default function HomePage() {
             <Typography
               variant="h5"
               sx={{
-                mb: 5,
+                fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+                mb: { xs: 3, sm: 4, md: 5 },
                 opacity: 0.95,
                 maxWidth: 600,
                 mx: "auto",
+                px: { xs: 2, sm: 0 },
                 textShadow: "0 1px 10px rgba(0,0,0,0.15)",
               }}
             >
@@ -160,10 +165,11 @@ export default function HomePage() {
                   size="large"
                   onClick={handleSearch}
                   sx={{
-                    minWidth: { xs: "100%", sm: 140 },
-                    height: { xs: 48, sm: 56 },
-                    fontSize: { xs: "1rem", sm: "1.1rem" },
+                    minWidth: { xs: "100%", sm: 130 },
+                    height: { xs: 48, sm: 52, md: 56 },
+                    fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
                     fontWeight: 600,
+                    borderRadius: { xs: 2, sm: 3 },
                     boxShadow: "none",
                     "&:hover": {
                       boxShadow: "0 4px 16px rgba(255,107,53,0.4)",

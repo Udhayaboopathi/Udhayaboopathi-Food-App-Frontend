@@ -147,9 +147,13 @@ export default function RestaurantCard({
           bgcolor: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(10px)",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          p: { xs: 1, sm: 1.5 },
           "&:hover": {
             bgcolor: "white",
             transform: "scale(1.1)",
+          },
+          "&:active": {
+            transform: "scale(0.95)",
           },
           zIndex: 1,
           transition: "all 0.2s ease",

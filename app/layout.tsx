@@ -10,6 +10,7 @@ import { Box } from "@mui/material";
 import { theme } from "@/lib/theme";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ToastProvider } from "@/components/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -36,19 +37,21 @@ export default function RootLayout({
       <body>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100vh",
-            }}
-          >
-            <Navbar />
-            <Box component="main" sx={{ flexGrow: 1 }}>
-              {children}
+          <ToastProvider>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+              }}
+            >
+              <Navbar />
+              <Box component="main" sx={{ flexGrow: 1 }}>
+                {children}
+              </Box>
+              <Footer />
             </Box>
-            <Footer />
-          </Box>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

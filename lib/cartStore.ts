@@ -25,6 +25,7 @@ interface CartState {
   clearCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;
+  addMultipleItems: (items: CartItem[]) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -104,6 +105,52 @@ export const useCartStore = create<CartState>()(
           (count: number, item: CartItem) => count + item.quantity,
           0
         );
+      },
+
+      addMultipleItems: (items: CartItem[]) => {
+        if (items.length === 0) return;
+
+        const state = get();
+        const firstRestaurantId = items[0].restaurant_id;
+
+        // Check if all items are from the same restaurant
+        const allSameRestaurant = items.every(
+          (item) => item.restaurant_id === firstRestaurantId
+        );
+
+        if (!allSameRestaurant) {
+          alert("Cannot add items from multiple restaurants");
+          return;
+        }
+
+        // Check if cart has items from different restaurant
+        if (state.restaurantId && state.restaurantId !== firstRestaurantId) {
+          if (
+            !confirm(
+              "Your cart contains items from another restaurant. Clear cart and add these items?"
+            )
+          ) {
+            return;
+          }
+          set({ items: items, restaurantId: firstRestaurantId });
+          return;
+        }
+
+        // Merge items with existing cart
+        const newItems = [...state.items];
+        items.forEach((newItem) => {
+          const existingIndex = newItems.findIndex((i) => i.id === newItem.id);
+          if (existingIndex >= 0) {
+            newItems[existingIndex].quantity += newItem.quantity;
+          } else {
+            newItems.push(newItem);
+          }
+        });
+
+        set({
+          items: newItems,
+          restaurantId: firstRestaurantId,
+        });
       },
     }),
     {

@@ -9,28 +9,15 @@ import {
   Container,
   Typography,
   Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  CardActions,
-  Button,
-  Chip,
   Box,
   CircularProgress,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
-import {
-  Add as AddIcon,
-  Restaurant as RestaurantIcon,
-} from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/cartStore";
 import { useAuthStore } from "@/lib/authStore";
 import { apiClient } from "@/lib/api";
+import MenuCard from "@/components/MenuCard";
+import SearchFilters, { FilterOptions } from "@/components/SearchFilters";
 
 interface MenuItem {
   id: number;
@@ -54,28 +41,35 @@ export default function FoodPage() {
   const { addItem } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [vegFilter, setVegFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
-  const [categories, setCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<FilterOptions>({
+    cuisines: [],
+    priceRange: [0, 500],
+    rating: 0,
+    deliveryTime: 60,
+    dietary: [],
+    sortBy: "relevance",
+  });
 
   useEffect(() => {
     fetchAllMenuItems();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, filters, allMenuItems]);
 
   const fetchAllMenuItems = async () => {
     try {
       setLoading(true);
       // Fetch all menu items directly
       const menuResponse = await apiClient.get("/menu");
-      console.log("Menu response:", menuResponse.data);
-      const allMenuItems = menuResponse.data;
+      const allItems = menuResponse.data;
 
       // Fetch restaurants to map names
       const restaurantsResponse = await apiClient.get("/restaurants");
-      console.log("Restaurants response:", restaurantsResponse.data);
       const restaurants = restaurantsResponse.data;
 
       // Create restaurant lookup map
@@ -85,7 +79,7 @@ export default function FoodPage() {
       }, {});
 
       // Map restaurant data to menu items
-      const itemsWithRestaurant = allMenuItems.map((item: any) => ({
+      const itemsWithRestaurant = allItems.map((item: any) => ({
         ...item,
         id: parseInt(item.id),
         price: parseFloat(item.price),
@@ -101,19 +95,87 @@ export default function FoodPage() {
         },
       }));
 
-      console.log("Processed menu items:", itemsWithRestaurant);
+      setAllMenuItems(itemsWithRestaurant);
       setMenuItems(itemsWithRestaurant);
-
-      // Extract unique categories
-      const uniqueCategories = Array.from(
-        new Set(itemsWithRestaurant.map((item: MenuItem) => item.category))
-      ) as string[];
-      setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...allMenuItems];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.restaurant?.name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Cuisine filter (based on restaurant cuisine or item category)
+    if (filters.cuisines.length > 0) {
+      filtered = filtered.filter((item) =>
+        filters.cuisines.some(
+          (cuisine) =>
+            item.restaurant?.cuisine_type
+              ?.toLowerCase()
+              .includes(cuisine.toLowerCase()) ||
+            item.category.toLowerCase().includes(cuisine.toLowerCase())
+        )
+      );
+    }
+
+    // Price range filter
+    filtered = filtered.filter(
+      (item) =>
+        item.price >= filters.priceRange[0] &&
+        item.price <= filters.priceRange[1]
+    );
+
+    // Dietary filter
+    if (filters.dietary.length > 0) {
+      filtered = filtered.filter((item) => {
+        if (filters.dietary.includes("Vegetarian") && item.is_veg) return true;
+        if (filters.dietary.includes("Non-Veg") && !item.is_veg) return true;
+        // Other dietary options can be added based on item properties
+        return false;
+      });
+    }
+
+    // Only show available items
+    filtered = filtered.filter((item) => item.is_available);
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (filters.sortBy) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "name":
+          return a.name.localeCompare(b.name);
+        default: // relevance
+          return a.name.localeCompare(b.name);
+      }
+    });
+
+    setMenuItems(filtered);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
   };
 
   const handleAddToCart = (item: MenuItem) => {
@@ -134,33 +196,6 @@ export default function FoodPage() {
     });
   };
 
-  const filteredItems = menuItems.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.restaurant?.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || item.category === categoryFilter;
-    const matchesVeg =
-      vegFilter === "all" ||
-      (vegFilter === "veg" && item.is_veg) ||
-      (vegFilter === "non-veg" && !item.is_veg);
-    return matchesSearch && matchesCategory && matchesVeg && item.is_available;
-  });
-
-  // Sort items
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "name":
-      default:
-        return a.name.localeCompare(b.name);
-    }
-  });
-
   if (loading) {
     return (
       <Container sx={{ textAlign: "center", py: 8 }}>
@@ -173,10 +208,19 @@ export default function FoodPage() {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container
+      maxWidth="xl"
+      sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3 } }}
+    >
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom>
+      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          fontWeight={700}
+          sx={{ fontSize: { xs: "1.75rem", sm: "2.5rem", md: "3rem" } }}
+        >
           All Food Items
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
@@ -184,155 +228,49 @@ export default function FoodPage() {
         </Typography>
       </Box>
 
-      {/* Filters */}
-      <Box sx={{ mb: 4, display: "flex", gap: 2, flexWrap: "wrap" }}>
-        <TextField
-          label="Search food or restaurant"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ flexGrow: 1, minWidth: 250 }}
-        />
-        <FormControl sx={{ minWidth: 150 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={categoryFilter}
-            label="Category"
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 150 }}>
-          <InputLabel>Type</InputLabel>
-          <Select
-            value={vegFilter}
-            label="Type"
-            onChange={(e) => setVegFilter(e.target.value)}
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="veg">Veg Only</MenuItem>
-            <MenuItem value="non-veg">Non-Veg</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 150 }}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortBy}
-            label="Sort By"
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="price-low">Price: Low to High</MenuItem>
-            <MenuItem value="price-high">Price: High to Low</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* Search and Filters */}
+      <SearchFilters
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Results Count */}
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Showing {sortedItems.length} items
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          mb: { xs: 1.5, sm: 2 },
+          fontSize: { xs: "0.875rem", sm: "0.95rem" },
+        }}
+      >
+        {menuItems.length} {menuItems.length === 1 ? "item" : "items"} found
       </Typography>
 
       {/* Menu Items Grid */}
-      {sortedItems.length === 0 ? (
+      {menuItems.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 8 }}>
           <Typography variant="h6" color="text.secondary">
             No items found matching your filters
           </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Try adjusting your filters or search query
+          </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
-          {sortedItems.map((item) => (
+        <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+          {menuItems.map((item) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: 4,
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={item.image_url || "/placeholder-food.jpg"}
-                  alt={item.name}
-                  sx={{ objectFit: "cover" }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" gutterBottom noWrap>
-                    {item.name}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                      mb: 1,
-                    }}
-                  >
-                    <RestaurantIcon fontSize="small" color="action" />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      noWrap
-                      sx={{ cursor: "pointer" }}
-                      onClick={() =>
-                        router.push(`/restaurants/${item.restaurant_id}`)
-                      }
-                    >
-                      {item.restaurant?.name}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      mb: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                    }}
-                  >
-                    {item.description}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-                    <Chip label={item.category} size="small" color="primary" />
-                    {item.restaurant?.cuisine_type && (
-                      <Chip
-                        label={item.restaurant.cuisine_type}
-                        size="small"
-                        variant="outlined"
-                      />
-                    )}
-                  </Box>
-                  <Typography variant="h6" color="primary">
-                    ₹{item.price.toFixed(2)}
-                  </Typography>
-                </CardContent>
-                <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    startIcon={<AddIcon />}
-                    onClick={() => handleAddToCart(item)}
-                  >
-                    Add to Cart
-                  </Button>
-                </CardActions>
-              </Card>
+              <MenuCard
+                id={item.id}
+                name={item.name}
+                description={item.description}
+                price={item.price}
+                category={item.category}
+                image={item.image_url}
+                is_veg={item.is_veg}
+                restaurant_id={item.restaurant_id}
+                restaurant_name={item.restaurant?.name || ""}
+              />
             </Grid>
           ))}
         </Grid>
