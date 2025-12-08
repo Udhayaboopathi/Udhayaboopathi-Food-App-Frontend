@@ -267,7 +267,7 @@ export default function FoodPage() {
                 price={item.price}
                 category={item.category}
                 image={item.image_url}
-                is_veg={item.is_veg}
+                is_veg={item.is_veg === true}
                 restaurant_id={item.restaurant_id}
                 restaurant_name={item.restaurant?.name || ""}
               />
