@@ -212,8 +212,8 @@ export default function Navbar() {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 1,
-                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                  gap: { xs: 0.5, sm: 1 },
+                  fontSize: { xs: "1.1rem", sm: "1.5rem" },
                   background:
                     "linear-gradient(135deg, #FF6B35 0%, #264653 100%)",
                   backgroundClip: "text",
@@ -221,13 +221,7 @@ export default function Navbar() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                🍔{" "}
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  EatUpNow
-                </Box>
+                🍔 EatUpNow
               </Typography>
             </Box>
 

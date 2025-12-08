@@ -131,10 +131,10 @@ export default function HomePage() {
               <Box
                 sx={{
                   display: "flex",
-                  gap: { xs: 0, sm: 2 },
+                  gap: { xs: 1.5, sm: 2 },
                   flexDirection: { xs: "column", sm: "row" },
                   bgcolor: "white",
-                  borderRadius: 4,
+                  borderRadius: { xs: 3, sm: 4 },
                   p: { xs: 1.5, sm: 1 },
                   boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
                 }}
@@ -146,17 +146,36 @@ export default function HomePage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   variant="outlined"
+                  size="medium"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon color="action" />
+                        <SearchIcon
+                          color="action"
+                          sx={{ fontSize: { xs: "1.4rem", sm: "1.5rem" } }}
+                        />
                       </InputAdornment>
                     ),
                     sx: {
+                      bgcolor: "white",
+                      borderRadius: { xs: 2, sm: 0 },
                       "& .MuiOutlinedInput-notchedOutline": {
-                        border: "none",
+                        border: { xs: "1px solid #e0e0e0", sm: "none" },
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: { xs: "primary.main", sm: "transparent" },
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: { xs: "primary.main", sm: "transparent" },
+                        borderWidth: { xs: "2px", sm: "0" },
                       },
                       fontSize: { xs: "0.95rem", sm: "1rem" },
+                      py: { xs: 0.5, sm: 0 },
+                    },
+                  }}
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      minHeight: { xs: 50, sm: 56 },
                     },
                   }}
                 />
@@ -164,13 +183,17 @@ export default function HomePage() {
                   variant="contained"
                   size="large"
                   onClick={handleSearch}
+                  startIcon={
+                    <SearchIcon sx={{ display: { xs: "none", sm: "block" } }} />
+                  }
                   sx={{
-                    minWidth: { xs: "100%", sm: 130 },
-                    height: { xs: 48, sm: 52, md: 56 },
-                    fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
+                    minWidth: { xs: "100%", sm: 140 },
+                    height: { xs: 50, sm: 56 },
+                    fontSize: { xs: "1rem", sm: "1rem" },
                     fontWeight: 600,
                     borderRadius: { xs: 2, sm: 3 },
                     boxShadow: "none",
+                    textTransform: "none",
                     "&:hover": {
                       boxShadow: "0 4px 16px rgba(255,107,53,0.4)",
                     },
